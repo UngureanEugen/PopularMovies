@@ -17,21 +17,30 @@ package android.com.movies.data;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.os.AsyncTask;
+import android.com.movies.AppExecutors;
+import android.com.movies.data.remote.ApiResponse;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
+/**
+ * A generic class that can provide a resource backed by both the sqlite database and the network.
+ * <p>
+ * You can read more about it in the <a href="https://developer.android.com/arch">Architecture
+ * Guide</a>.
+ *
+ * @param <ResultType>
+ * @param <RequestType>
+ */
 public abstract class NetworkBoundResource<ResultType, RequestType> {
+    private final AppExecutors appExecutors;
+
     private final MediatorLiveData<Resource<ResultType>> result = new MediatorLiveData<>();
 
     @MainThread
-    NetworkBoundResource() {
+    public NetworkBoundResource(AppExecutors appExecutors) {
+        this.appExecutors = appExecutors;
         result.setValue(Resource.loading(null));
         LiveData<ResultType> dbSource = loadFromDb();
         result.addSource(dbSource, data -> {
@@ -45,47 +54,49 @@ public abstract class NetworkBoundResource<ResultType, RequestType> {
     }
 
     private void fetchFromNetwork(final LiveData<ResultType> dbSource) {
+        LiveData<ApiResponse<RequestType>> apiResponse = createCall();
+        // we re-attach dbSource as a new source, it will dispatch its latest value quickly
         result.addSource(dbSource, newData -> result.setValue(Resource.loading(newData)));
-        createCall().enqueue(new Callback<RequestType>() {
-            @Override
-            public void onResponse(Call<RequestType> call, Response<RequestType> response) {
-                result.removeSource(dbSource);
-                saveResultAndReInit(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<RequestType> call, Throwable t) {
+        result.addSource(apiResponse, response -> {
+            result.removeSource(apiResponse);
+            result.removeSource(dbSource);
+            //noinspection ConstantConditions
+            if (response.isSuccessful()) {
+                appExecutors.diskIO().execute(() -> {
+                    saveCallResult(processResponse(response));
+                    appExecutors.mainThread().execute(() ->
+                            // we specially request a new live data,
+                            // otherwise we will get immediately last cached value,
+                            // which may not be updated with latest results received from network.
+                            result.addSource(loadFromDb(),
+                                    newData -> result.setValue(Resource.success(newData)))
+                    );
+                });
+            } else {
                 onFetchFailed();
-                result.removeSource(dbSource);
-                result.addSource(dbSource, newData -> result.setValue(Resource.error(t.getMessage(), newData)));
+                result.addSource(dbSource,
+                        newData -> result.setValue(Resource.error(response.errorMessage, newData)));
             }
         });
     }
 
-    @MainThread
-    private void saveResultAndReInit(RequestType response) {
-        new AsyncTask<Void, Void, Void>() {
+    protected void onFetchFailed() {
+    }
 
-            @Override
-            protected Void doInBackground(Void... voids) {
-                saveCallResult(response);
-                return null;
-            }
+    public LiveData<Resource<ResultType>> asLiveData() {
+        return result;
+    }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                result.addSource(loadFromDb(), newData -> result.setValue(Resource.success(newData)));
-            }
-        }.execute();
+    @WorkerThread
+    protected RequestType processResponse(ApiResponse<RequestType> response) {
+        return response.body;
     }
 
     @WorkerThread
     protected abstract void saveCallResult(@NonNull RequestType item);
 
     @MainThread
-    protected boolean shouldFetch(@Nullable ResultType data) {
-        return true;
-    }
+    protected abstract boolean shouldFetch(@Nullable ResultType data);
 
     @NonNull
     @MainThread
@@ -93,13 +104,5 @@ public abstract class NetworkBoundResource<ResultType, RequestType> {
 
     @NonNull
     @MainThread
-    protected abstract Call<RequestType> createCall();
-
-    @MainThread
-    protected void onFetchFailed() {
-    }
-
-    public final LiveData<Resource<ResultType>> getAsLiveData() {
-        return result;
-    }
+    protected abstract LiveData<ApiResponse<RequestType>> createCall();
 }

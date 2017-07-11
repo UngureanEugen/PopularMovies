@@ -1,31 +1,31 @@
 package android.com.movies.viewmodel;
 
 import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Transformations;
-import android.arch.lifecycle.ViewModel;
-import android.com.movies.model.Movie;
+import android.com.movies.App;
+import android.com.movies.data.Resource;
+import android.com.movies.data.remote.MovieEntity;
+import android.com.movies.repository.MovieRepository;
 
 import java.util.List;
 
-public class MovieViewModel extends ViewModel {
+import javax.inject.Inject;
 
-    private static final MutableLiveData ABSENT = new MutableLiveData();
+public class MovieViewModel extends AndroidViewModel {
+    @Inject
+    MovieRepository repository;
 
-    {
-        ABSENT.setValue(null);
-    }
+    private LiveData<Resource<List<MovieEntity>>> observableMovies;
 
-    private final LiveData<List<Movie>> observableMovies;
-
+    @Inject
     public MovieViewModel(Application application) {
         super(application);
-        observableMovies = Transformations.switchMap()
+        App.moviesComponent.inject(this);
     }
 
 
-    public LiveData getMovies() {
-        return movies;
+    public LiveData<Resource<List<MovieEntity>>> getPopularMovies() {
+        return repository.getPopularMovies();
     }
 }

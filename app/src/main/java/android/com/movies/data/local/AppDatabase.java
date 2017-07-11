@@ -19,11 +19,11 @@ package android.com.movies.data.local;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 import android.com.movies.data.local.dao.MovieDao;
-import android.com.movies.data.local.entity.MovieEntity;
+import android.com.movies.data.remote.MovieEntity;
 
-@Database(entities = {MovieEntity.class}, version = 1)
+@Database(entities = {MovieEntity.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
-    static final String DATABASE_NAME = "popular-movies-db";
+    public static final String DATABASE_NAME = "movies-db";
 
     public abstract MovieDao movieDao();
 }
