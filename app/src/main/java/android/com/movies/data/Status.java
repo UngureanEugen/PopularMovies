@@ -23,7 +23,7 @@ package android.com.movies.data;
  * {@code LiveData<Resource<T>>} to pass back the latest data to the UI with its fetch status.
  */
 public enum Status {
-    SUCCESS,
-    ERROR,
-    LOADING
+  SUCCESS,
+  ERROR,
+  LOADING
 }

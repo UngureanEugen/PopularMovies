@@ -21,18 +21,18 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-import android.com.movies.data.remote.MovieEntity;
-
+import android.com.movies.model.MovieEntity;
 import java.util.List;
 
 @Dao
 public interface MovieDao {
-    @Query("SELECT * FROM movies")
-    LiveData<List<MovieEntity>> loadMovies();
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertMovies(List<MovieEntity> movies);
+  @Query("SELECT * FROM movies ORDER BY popularity DESC")
+  LiveData<List<MovieEntity>> loadMostPopularMovies();
 
-    @Query("SELECT * FROM movies")
-    LiveData<List<MovieEntity>> loadPopular();
+  @Query("SELECT * FROM movies ORDER BY voteAverage DESC")
+  LiveData<List<MovieEntity>> loadTopRatedMovies();
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  void insertMovies(List<MovieEntity> movies);
 }

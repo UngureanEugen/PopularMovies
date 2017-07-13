@@ -1,4 +1,9 @@
 <resources>
-    <string name="app_name">Popular Movies</string>
-    <string name="cd_movies_list">Movies List</string>
+  <string name="app_name">Popular Movies</string>
+  <string name="cd_movies_list">Movies List</string>
+  <string name="menu_sort">Sort</string>
+  <string name="action_most_popular">Most Popular</string>
+  <string name="action_top_rated">Top Rated</string>
+  <string name="mark_favorite">mark as\n favorite</string>
+  <string name="poster">poster</string>
 </resources>

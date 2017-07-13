@@ -1,7 +1,8 @@
 package android.com.movies.ui.movie;
 
-import android.com.movies.model.Movie;
+import android.com.movies.model.MovieEntity;
+import android.widget.ImageView;
 
-public interface MovieClickCallback {
-    void onClick(Movie movie);
+interface MovieClickCallback {
+  void onClick(MovieEntity movie, ImageView sharedView);
 }

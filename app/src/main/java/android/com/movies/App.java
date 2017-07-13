@@ -6,13 +6,13 @@ import android.com.movies.di.DaggerMoviesComponent;
 import android.com.movies.di.MoviesComponent;
 
 public class App extends Application {
-    public static MoviesComponent moviesComponent;
+  public static MoviesComponent moviesComponent;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        moviesComponent = DaggerMoviesComponent.builder()
-                .appModule(new AppModule(this))
-                .build();
-    }
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    moviesComponent = DaggerMoviesComponent.builder()
+        .appModule(new AppModule(this))
+        .build();
+  }
 }

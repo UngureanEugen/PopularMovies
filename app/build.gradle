@@ -1,71 +1,71 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
-    defaultConfig {
-        applicationId "android.com.movies"
-        minSdkVersion 15
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+  compileSdkVersion 25
+  buildToolsVersion "25.0.3"
+  defaultConfig {
+    applicationId "android.com.movies"
+    minSdkVersion 16
+    targetSdkVersion 25
+    versionCode 1
+    versionName "1.0"
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      buildConfigField("String", "API_KEY", "\"\"")
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_KEY", "\"6d051b9ef75d7e7b167978fb2e967804\"")
-        }
-        debug {
-            buildConfigField("String", "API_KEY", "\"6d051b9ef75d7e7b167978fb2e967804\"")
-        }
+    debug {
+      buildConfigField("String", "API_KEY", "\"\"")
     }
+  }
 
-    dataBinding {
-        enabled = true
-    }
+  dataBinding {
+    enabled = true
+  }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.android.support:appcompat-v7:' + rootProject.supportLibVersion
-    compile 'com.android.support:cardview-v7:' + rootProject.supportLibVersion
-    compile 'com.android.support:recyclerview-v7:' + rootProject.supportLibVersion
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    exclude group: 'com.android.support', module: 'support-annotations'
+  })
+  compile 'com.android.support:appcompat-v7:' + rootProject.supportLibVersion
+  compile 'com.android.support:cardview-v7:' + rootProject.supportLibVersion
+  compile 'com.android.support:recyclerview-v7:' + rootProject.supportLibVersion
 
-    compile 'com.squareup.picasso:picasso:' + rootProject.picassoVersion
-    compile 'com.jakewharton.timber:timber:' + rootProject.timberVersion
-    compile 'com.google.code.gson:gson:' + rootProject.gsonVersion
+  compile 'com.squareup.picasso:picasso:' + rootProject.picassoVersion
+  compile 'com.jakewharton.timber:timber:' + rootProject.timberVersion
+  compile 'com.google.code.gson:gson:' + rootProject.gsonVersion
 
-    //retrofit
-    compile 'com.squareup.retrofit2:retrofit:' + rootProject.retrofitVersion
-    compile 'com.squareup.retrofit2:converter-gson:' + rootProject.retrofitVersion
-    compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+  //retrofit
+  compile 'com.squareup.retrofit2:retrofit:' + rootProject.retrofitVersion
+  compile 'com.squareup.retrofit2:converter-gson:' + rootProject.retrofitVersion
+  compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 
-    //dagger
-    compile 'com.google.dagger:dagger:' + rootProject.daggerVersion
-    annotationProcessor 'com.google.dagger:dagger-compiler:' + rootProject.daggerVersion
+  //dagger
+  compile 'com.google.dagger:dagger:' + rootProject.daggerVersion
+  annotationProcessor 'com.google.dagger:dagger-compiler:' + rootProject.daggerVersion
 
-    //lifecycle
-    compile "android.arch.lifecycle:runtime:" + rootProject.lifecycleVersion
-    compile "android.arch.lifecycle:extensions:" + rootProject.lifecycleVersion
-    annotationProcessor "android.arch.lifecycle:compiler:" + rootProject.lifecycleVersion
+  //lifecycle
+  compile "android.arch.lifecycle:runtime:" + rootProject.lifecycleVersion
+  compile "android.arch.lifecycle:extensions:" + rootProject.lifecycleVersion
+  annotationProcessor "android.arch.lifecycle:compiler:" + rootProject.lifecycleVersion
 
-    //room
-    compile "android.arch.persistence.room:runtime:" + rootProject.lifecycleVersion
-    annotationProcessor "android.arch.persistence.room:compiler:" + rootProject.lifecycleVersion
+  //room
+  compile "android.arch.persistence.room:runtime:" + rootProject.lifecycleVersion
+  annotationProcessor "android.arch.persistence.room:compiler:" + rootProject.lifecycleVersion
 
-    //testing room
-    testCompile "android.arch.persistence.room:testing:" + rootProject.lifecycleVersion
+  //testing room
+  testCompile "android.arch.persistence.room:testing:" + rootProject.lifecycleVersion
 
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    testCompile 'junit:junit:4.12'
+  compile 'com.android.support.constraint:constraint-layout:1.0.2'
+  testCompile 'junit:junit:4.12'
 }
