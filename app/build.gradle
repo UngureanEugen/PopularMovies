@@ -65,6 +65,12 @@ dependencies {
 
   //testing room
   testCompile "android.arch.persistence.room:testing:" + rootProject.lifecycleVersion
+  androidTestImplementation "android.arch.persistence.room:testing:" + rootProject.lifecycleVersion
+
+  //Mockito
+  testCompile "org.mockito:mockito-core:" + rootProject.mockitoVersion
+  androidTestCompile("android.arch.core:core-testing:" + rootProject.lifecycleVersion, {})
+  androidTestCompile "org.mockito:mockito-android:" + rootProject.mockitoVersion
 
   compile 'com.android.support.constraint:constraint-layout:1.0.2'
   testCompile 'junit:junit:4.12'
