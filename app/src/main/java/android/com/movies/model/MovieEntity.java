@@ -1,11 +1,13 @@
 package android.com.movies.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import java.util.UUID;
 
 @SuppressWarnings("ALL") @Entity(tableName = "movies")
 public class MovieEntity implements Parcelable {
@@ -54,6 +56,24 @@ public class MovieEntity implements Parcelable {
   public MovieEntity() {
   }
 
+  @Ignore
+  public MovieEntity(String title) {
+    this.voteCount = 0;
+    this.id = UUID.randomUUID().hashCode();
+    this.video = false;
+    this.voteAverage = 0d;
+    this.title = title;
+    this.popularity = 0d;
+    this.posterPath = "";
+    this.originalLanguage = "";
+    this.originalTitle = "";
+    this.backdropPath = "";
+    this.adult = false;
+    this.overview = "";
+    this.releaseDate = "";
+  }
+
+  @Ignore
   protected MovieEntity(Parcel in) {
     if (in.readByte() == 0) {
       voteCount = null;

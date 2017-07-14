@@ -1,36 +1,37 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    repositories {
-        jcenter()
-        maven { url 'https://maven.google.com' }
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-alpha6'
+  repositories {
+    jcenter()
+    maven { url 'https://maven.google.com' }
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:3.0.0-alpha6'
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
+    // NOTE: Do not place your application dependencies here; they belong
+    // in the individual module build.gradle files
+  }
 }
 
 allprojects {
-    repositories {
-        jcenter()
-        mavenCentral()
-        maven { url 'https://maven.google.com' }
-    }
+  repositories {
+    jcenter()
+    mavenCentral()
+    maven { url 'https://maven.google.com' }
+  }
 }
 
 ext {
-    supportLibVersion = "25.3.1"
-    picassoVersion = "2.5.2"
-    lifecycleVersion = "1.0.0-alpha3"
-    retrofitVersion = "2.2.0"
-    timberVersion = "4.5.1"
-    gsonVersion = "2.8.1"
-    daggerVersion = "2.11"
+  supportLibVersion = "25.3.1"
+  picassoVersion = "2.5.2"
+  lifecycleVersion = "1.0.0-alpha3"
+  retrofitVersion = "2.2.0"
+  timberVersion = "4.5.1"
+  gsonVersion = "2.8.1"
+  daggerVersion = "2.11"
+  mockitoVersion = "2.7.22"
 }
 
 task clean(type: Delete) {
-    delete rootProject.buildDir
+  delete rootProject.buildDir
 }
