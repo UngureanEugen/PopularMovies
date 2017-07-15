@@ -20,7 +20,7 @@ public class MovieViewModel extends AndroidViewModel {
   private final LiveData<Resource<List<MovieEntity>>> movies =
       Transformations.switchMap(sortType, sort -> repository.getMovies(sort));
 
-  @Inject MovieViewModel(Application application) {
+  @Inject public MovieViewModel(Application application) {
     super(application);
     App.moviesComponent.inject(this);
   }
