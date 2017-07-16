@@ -1,4 +1,4 @@
-package android.com.movies.data.local.dao;
+package android.com.movies;
 
 import android.arch.persistence.room.Room;
 import android.com.movies.data.local.AppDatabase;
