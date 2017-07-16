@@ -13,20 +13,21 @@
       <FrameLayout
           android:id="@+id/lt_title"
           android:layout_width="match_parent"
-          android:layout_height="130dp"
+          android:layout_height="@dimen/layout_title_height"
           android:background="@color/colorAccent">
 
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="36sp"
-            android:textColor="@color/white"
+            android:textSize="@dimen/title_text_size"
+            android:textColor="@color/title_text_color"
             android:layout_margin="@dimen/margin_default"
             android:gravity="start|center"
             android:layout_marginStart="@dimen/margin_default"
             android:layout_marginLeft="@dimen/margin_default"
-            android:maxLines="2"/>
+            android:maxLines="2"
+            tools:text="@string/chappie_title"/>
 
       </FrameLayout>
 
@@ -41,7 +42,8 @@
             android:layout_height="150dp"
             android:layout_marginRight="@dimen/margin_default"
             android:layout_marginEnd="@dimen/margin_default"
-            android:contentDescription="@string/poster"/>
+            android:contentDescription="@string/poster"
+            tools:src="@mipmap/ic_launcher"/>
 
         <LinearLayout android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -54,7 +56,8 @@
               android:id="@+id/tv_release_date"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"/>
+              android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+              tools:text="@string/chappie_release_date"/>
 
           <TextView
               android:id="@+id/tv_duration"
@@ -62,14 +65,16 @@
               android:layout_height="wrap_content"
               android:textStyle="italic"
               android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
-              android:layout_marginTop="@dimen/margin_small"/>
+              android:layout_marginTop="@dimen/margin_small"
+              tools:text="@string/chappie_duration"/>
 
           <TextView
               android:id="@+id/tv_vote"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-              android:layout_marginTop="@dimen/margin_small"/>
+              android:layout_marginTop="@dimen/margin_small"
+              tools:text="@string/chappie_vote"/>
 
           <Button
               android:id="@+id/btn_mark_favorite"
@@ -89,7 +94,8 @@
           android:id="@+id/tv_plot_synopsis"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_margin="@dimen/margin_default"/>
+          android:layout_margin="@dimen/margin_default"
+          tools:text="@string/chappie_plot_synopsis"/>
 
     </LinearLayout>
 
