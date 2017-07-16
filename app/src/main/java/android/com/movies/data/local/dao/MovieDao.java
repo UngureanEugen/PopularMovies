@@ -28,11 +28,9 @@ import java.util.List;
 @Dao
 public interface MovieDao {
 
-  @VisibleForTesting
   @Query("SELECT * FROM movies ORDER BY popularity DESC")
   LiveData<List<MovieEntity>> loadMostPopularMovies();
 
-  @VisibleForTesting
   @Query("SELECT * FROM movies ORDER BY voteAverage DESC")
   LiveData<List<MovieEntity>> loadTopRatedMovies();
 

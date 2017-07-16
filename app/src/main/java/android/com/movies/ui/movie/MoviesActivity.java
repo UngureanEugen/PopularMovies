@@ -22,23 +22,22 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 
 import static android.arch.lifecycle.Lifecycle.State.STARTED;
-import static android.com.movies.viewmodel.MovieViewModel.SORT;
-import static android.com.movies.viewmodel.MovieViewModel.SORT.MOST_POPULAR;
-import static android.com.movies.viewmodel.MovieViewModel.SORT.TOP_RATED;
+import static android.com.movies.ui.movie.SortType.MOST_POPULAR;
+import static android.com.movies.ui.movie.SortType.TOP_RATED;
 
 public class MoviesActivity extends AppCompatActivity
     implements LifecycleRegistryOwner, MovieClickCallback {
 
+  private static final String SORT_KEY = "currentSort";
+  public static final String EXTRA_MOVIE_IMAGE_TRANSITION = "movieImageTransition";
+  public static final String EXTRA_MOVIE = "movie";
+
+  private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
   private ActivityMoviesBinding binding;
   private MovieViewModel movieViewModel;
   private MoviesAdapter moviesAdapter;
   private SharedPreferences sharedPreferences;
-  private SORT currentType;
-  private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
-  
-  private static final String SORT_KEY = "currentSort";
-  public static final String EXTRA_MOVIE_IMAGE_TRANSITION = "movieImageTransition";
-  public static final String EXTRA_MOVIE = "movie";
+  private @SortType int currentSortType;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +55,10 @@ public class MoviesActivity extends AppCompatActivity
     movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
     sharedPreferences = getSharedPreferences("movie-prefs", MODE_PRIVATE);
-    currentType = SORT.values()[sharedPreferences.getInt(SORT_KEY, SORT.TOP_RATED.ordinal())];
+    currentSortType = sharedPreferences.getInt(SORT_KEY, TOP_RATED);
 
     subscribeUi();
-    setSortType(currentType);
+    setSortType(currentSortType);
   }
 
   @Override
@@ -103,14 +102,14 @@ public class MoviesActivity extends AppCompatActivity
   @Override protected void onPause() {
     super.onPause();
     SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putInt(SORT_KEY, currentType.ordinal());
+    editor.putInt(SORT_KEY, currentSortType);
     editor.apply();
   }
 
-  private void setSortType(SORT type) {
+  private void setSortType(@SortType int type) {
     binding.moviesList.scrollToPosition(0);
     movieViewModel.setSortType(type);
-    currentType = type;
+    currentSortType = type;
   }
 
   private void subscribeUi() {

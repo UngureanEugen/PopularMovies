@@ -9,14 +9,16 @@ import android.com.movies.App;
 import android.com.movies.data.Resource;
 import android.com.movies.model.MovieEntity;
 import android.com.movies.repository.MovieRepository;
+import android.com.movies.ui.movie.SortType;
 import java.util.List;
 import javax.inject.Inject;
 
 public class MovieViewModel extends AndroidViewModel {
+
   @Inject
   MovieRepository repository;
 
-  private final MutableLiveData<SORT> sortType = new MutableLiveData<>();
+  private final MutableLiveData<Integer> sortType = new MutableLiveData<>();
   private final LiveData<Resource<List<MovieEntity>>> movies =
       Transformations.switchMap(sortType, sort -> repository.getMovies(sort));
 
@@ -29,18 +31,7 @@ public class MovieViewModel extends AndroidViewModel {
     return movies;
   }
 
-  public void setSortType(SORT type) {
+  public void setSortType(@SortType int type) {
     sortType.setValue(type);
-  }
-
-  public enum SORT {
-    TOP_RATED("vote_average.desc"),
-    MOST_POPULAR("popularity.desc");
-
-    SORT(String type) {
-      sortBy = type;
-    }
-
-    public final String sortBy;
   }
 }

@@ -9,11 +9,10 @@ import android.com.movies.data.remote.ApiResponse;
 import android.com.movies.data.remote.MovieService;
 import android.com.movies.data.remote.MoviesResponse;
 import android.com.movies.model.MovieEntity;
+import android.com.movies.ui.movie.SortType;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.util.List;
-
-import static android.com.movies.viewmodel.MovieViewModel.SORT;
 
 public class MovieRepository {
   private final MovieDao movieDao;
@@ -26,7 +25,7 @@ public class MovieRepository {
     appExecutors = AppExecutors.getInstance();
   }
 
-  public LiveData<Resource<List<MovieEntity>>> getMovies(SORT type) {
+  public LiveData<Resource<List<MovieEntity>>> getMovies(@SortType int type) {
 
     return new NetworkBoundResource<List<MovieEntity>, MoviesResponse>(appExecutors) {
 
@@ -44,19 +43,26 @@ public class MovieRepository {
       @Override
       protected LiveData<List<MovieEntity>> loadFromDb() {
         switch (type) {
-          case TOP_RATED:
+          case SortType.TOP_RATED:
             return movieDao.loadTopRatedMovies();
-          case MOST_POPULAR:
+          case SortType.MOST_POPULAR:
             return movieDao.loadMostPopularMovies();
           default:
-            return movieDao.loadMostPopularMovies();
+            return movieDao.loadTopRatedMovies();
         }
       }
 
       @NonNull
       @Override
       protected LiveData<ApiResponse<MoviesResponse>> createCall() {
-        return movieService.loadMovies(type.sortBy);
+        switch (type) {
+          case SortType.MOST_POPULAR:
+            return movieService.loadMostPopular();
+          case SortType.TOP_RATED:
+            return movieService.loadTopRated();
+          default:
+            return movieService.loadTopRated();
+        }
       }
     }.asLiveData();
   }
