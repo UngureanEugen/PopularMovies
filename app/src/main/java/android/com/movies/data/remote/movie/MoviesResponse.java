@@ -1,4 +1,4 @@
-package android.com.movies.data.remote;
+package android.com.movies.data.remote.movie;
 
 import android.com.movies.model.MovieEntity;
 import com.google.gson.annotations.SerializedName;

@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="android.com.movies.ui.movie.detail.MovieDetailsActivity">
-  <ScrollView
+  <android.support.v4.widget.NestedScrollView
       android:layout_width="match_parent"
       android:layout_height="match_parent">
 
@@ -97,8 +97,58 @@
           android:layout_margin="@dimen/margin_default"
           tools:text="@string/chappie_plot_synopsis"/>
 
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:background="@color/colorPrimary"
+          android:layout_marginStart="@dimen/margin_default"
+          android:layout_marginLeft="@dimen/margin_default"
+          android:layout_marginRight="@dimen/margin_default"
+          android:layout_marginEnd="@dimen/margin_default"
+          android:layout_marginBottom="@dimen/margin_default"/>
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="@dimen/margin_default"
+          android:layout_marginStart="@dimen/margin_default"
+          android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+          android:text="@string/trailers"/>
+
+      <android.support.v7.widget.RecyclerView
+          android:id="@+id/rv_trailers"
+          android:layout_margin="@dimen/margin_default"
+          tools:listItem="@layout/trailer_list_item"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"/>
+
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:background="@color/colorPrimary"
+          android:layout_marginStart="@dimen/margin_default"
+          android:layout_marginLeft="@dimen/margin_default"
+          android:layout_marginRight="@dimen/margin_default"
+          android:layout_marginEnd="@dimen/margin_default"
+          android:layout_marginBottom="@dimen/margin_default"/>
+      
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="@dimen/margin_default"
+          android:layout_marginStart="@dimen/margin_default"
+          android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+          android:text="@string/reviews"/>
+
+      <android.support.v7.widget.RecyclerView
+          android:id="@+id/rv_reviews"
+          android:layout_margin="@dimen/margin_default"
+          tools:listItem="@layout/trailer_list_item"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"/>
     </LinearLayout>
 
-  </ScrollView>
+  </android.support.v4.widget.NestedScrollView>
 
 </layout>

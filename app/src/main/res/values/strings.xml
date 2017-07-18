@@ -6,6 +6,7 @@
   <string name="action_top_rated">Top Rated</string>
   <string name="mark_favorite">mark as\n favorite</string>
   <string name="poster">poster</string>
+  <string name="trailers">Trailers:</string>
 
   <string name="chappie_title">Chappie</string>
   <string name="chappie_release_date">2015</string>
@@ -14,4 +15,7 @@
   <string name="chappie_plot_synopsis">Every child comes into the world full of promise, and none
     more so than Chappie: he is gifted, special, a prodigy. Chappie he is a robot.
   </string>
+  <string name="trailer">Trailer %d</string>
+  <string name="intent_title">Open with</string>
+  <string name="reviews">Reviews:</string>
 </resources>

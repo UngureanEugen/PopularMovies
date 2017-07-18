@@ -22,6 +22,8 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.com.movies.model.MovieEntity;
+import android.com.movies.model.Review;
+import android.com.movies.model.Video;
 import android.support.annotation.VisibleForTesting;
 import java.util.List;
 
@@ -41,4 +43,16 @@ public interface MovieDao {
   @VisibleForTesting
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   void insertMovies(List<MovieEntity> movies);
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  void insertVideos(List<Video> videos);
+
+  @Query("SELECT * FROM videos WHERE movie_id == :movieId")
+  LiveData<List<Video>> loadVideos(int movieId);
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  void insertReviews(List<Review> reviews);
+
+  @Query("SELECT * FROM reviews WHERE movie_id = :movieId")
+  LiveData<List<Review>> loadReviews(int movieId);
 }

@@ -7,12 +7,18 @@ import android.com.movies.data.Resource;
 import android.com.movies.data.local.dao.MovieDao;
 import android.com.movies.data.remote.ApiResponse;
 import android.com.movies.data.remote.MovieService;
-import android.com.movies.data.remote.MoviesResponse;
+import android.com.movies.data.remote.movie.MovieReviewsResponse;
+import android.com.movies.data.remote.movie.MovieVideosResponse;
+import android.com.movies.data.remote.movie.MoviesResponse;
 import android.com.movies.model.MovieEntity;
+import android.com.movies.model.Review;
+import android.com.movies.model.Video;
 import android.com.movies.ui.movie.SortType;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.util.List;
+
+import static android.com.movies.ui.movie.SortType.MOST_POPULAR;
 
 public class MovieRepository {
   private final MovieDao movieDao;
@@ -42,27 +48,63 @@ public class MovieRepository {
       @NonNull
       @Override
       protected LiveData<List<MovieEntity>> loadFromDb() {
-        switch (type) {
-          case SortType.TOP_RATED:
-            return movieDao.loadTopRatedMovies();
-          case SortType.MOST_POPULAR:
-            return movieDao.loadMostPopularMovies();
-          default:
-            return movieDao.loadTopRatedMovies();
-        }
+        return type == MOST_POPULAR ? movieDao.loadMostPopularMovies()
+            : movieDao.loadTopRatedMovies();
       }
 
       @NonNull
       @Override
       protected LiveData<ApiResponse<MoviesResponse>> createCall() {
-        switch (type) {
-          case SortType.MOST_POPULAR:
-            return movieService.loadMostPopular();
-          case SortType.TOP_RATED:
-            return movieService.loadTopRated();
-          default:
-            return movieService.loadTopRated();
+        final String path = type == MOST_POPULAR ? "popular" : "top_rated";
+        return movieService.fetchMovies(path);
+      }
+    }.asLiveData();
+  }
+
+  public LiveData<Resource<List<Video>>> getVideos(int movieId) {
+    return new NetworkBoundResource<List<Video>, MovieVideosResponse>(appExecutors) {
+
+      @Override protected void saveCallResult(@NonNull MovieVideosResponse response) {
+        for (Video videoItem : response.videos) {
+          videoItem.movieId = response.movieId;
         }
+        movieDao.insertVideos(response.videos);
+      }
+
+      @Override protected boolean shouldFetch(@Nullable List<Video> videos) {
+        return videos == null || videos.size() == 0;
+      }
+
+      @NonNull @Override protected LiveData<List<Video>> loadFromDb() {
+        return movieDao.loadVideos(movieId);
+      }
+
+      @NonNull @Override protected LiveData<ApiResponse<MovieVideosResponse>> createCall() {
+        return movieService.fetchVideos(String.valueOf(movieId));
+      }
+    }.asLiveData();
+  }
+
+  public LiveData<Resource<List<Review>>> getReviews(int movieId) {
+    return new NetworkBoundResource<List<Review>, MovieReviewsResponse>(appExecutors) {
+
+      @Override protected void saveCallResult(@NonNull MovieReviewsResponse response) {
+        for (Review item : response.reviews) {
+          item.movieId = response.movieId;
+        }
+        movieDao.insertReviews(response.reviews);
+      }
+
+      @Override protected boolean shouldFetch(@Nullable List<Review> reviews) {
+        return reviews == null || reviews.size() == 0;
+      }
+
+      @NonNull @Override protected LiveData<List<Review>> loadFromDb() {
+        return movieDao.loadReviews(movieId);
+      }
+
+      @NonNull @Override protected LiveData<ApiResponse<MovieReviewsResponse>> createCall() {
+        return movieService.fetchReviews(String.valueOf(movieId));
       }
     }.asLiveData();
   }
