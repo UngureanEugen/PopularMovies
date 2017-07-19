@@ -22,8 +22,11 @@ public class MovieViewModel extends AndroidViewModel {
 
   private final MutableLiveData<Integer> sortType = new MutableLiveData<>();
   private final MutableLiveData<Integer> movieId = new MutableLiveData<>();
+
   private final LiveData<Resource<List<MovieEntity>>> movies =
-      Transformations.switchMap(sortType, sort -> repository.getMovies(sort));
+      Transformations.switchMap(sortType,
+          sort -> repository.getMovies(sort));
+
   private final LiveData<Resource<List<Video>>> videos =
       Transformations.switchMap(movieId, movieId -> repository.getVideos(movieId));
   private final LiveData<Resource<List<Review>>> reviews =

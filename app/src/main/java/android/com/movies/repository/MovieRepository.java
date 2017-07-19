@@ -42,6 +42,7 @@ public class MovieRepository {
 
       @Override
       protected boolean shouldFetch(@Nullable List<MovieEntity> data) {
+        //return data == null
         return true;
       }
 
