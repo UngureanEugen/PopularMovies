@@ -1,21 +1,24 @@
 package android.com.movies.model;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import java.util.UUID;
 
-@SuppressWarnings("ALL") @Entity(tableName = "movies")
+import static android.com.movies.data.DatabaseContract.MovieColumns;
+import static android.com.movies.data.DatabaseContract.getColumnDouble;
+import static android.com.movies.data.DatabaseContract.getColumnInt;
+import static android.com.movies.data.DatabaseContract.getColumnString;
+
+@SuppressWarnings("ALL")
 public class MovieEntity implements Parcelable {
 
   @SerializedName("vote_count")
   @Expose
   public Integer voteCount;
-  @PrimaryKey
   @SerializedName("id")
   @Expose
   public Integer id;
@@ -56,7 +59,6 @@ public class MovieEntity implements Parcelable {
   public MovieEntity() {
   }
 
-  @Ignore
   public MovieEntity(String title) {
     this.voteCount = 0;
     this.id = UUID.randomUUID().hashCode();
@@ -73,7 +75,6 @@ public class MovieEntity implements Parcelable {
     this.releaseDate = "";
   }
 
-  @Ignore
   protected MovieEntity(Parcel in) {
     if (in.readByte() == 0) {
       voteCount = null;
@@ -119,6 +120,40 @@ public class MovieEntity implements Parcelable {
       return new MovieEntity[size];
     }
   };
+
+  public MovieEntity(Cursor cursor) {
+    this.id = getColumnInt(cursor, MovieColumns._ID);
+    this.title = getColumnString(cursor, MovieColumns.TITLE);
+    this.posterPath = getColumnString(cursor, MovieColumns.POSTER_PATH);
+    this.adult = getColumnInt(cursor, MovieColumns.IS_ADULT) == 1;
+    this.backdropPath = getColumnString(cursor, MovieColumns.BACKDROP_PATH);
+    this.originalLanguage = getColumnString(cursor, MovieColumns.ORIGINAL_LANGUAGE);
+    this.overview = getColumnString(cursor, MovieColumns.OVERVIEW);
+    this.popularity = getColumnDouble(cursor, MovieColumns.POPULARITY);
+    this.originalTitle = getColumnString(cursor, MovieColumns.ORIGINAL_TITLE);
+    this.releaseDate = getColumnString(cursor, MovieColumns.RELEASE_DATE);
+    this.video = getColumnInt(cursor, MovieColumns.HAS_VIDEO) == 1;
+    this.voteAverage = getColumnDouble(cursor, MovieColumns.VOTE_AVERAGE);
+    this.voteCount = getColumnInt(cursor, MovieColumns.VOTE_COUNT);
+  }
+
+  public static ContentValues convert(MovieEntity entity) {
+    ContentValues movieContent = new ContentValues();
+    movieContent.put(MovieColumns._ID, entity.id);
+    movieContent.put(MovieColumns.TITLE, entity.title);
+    movieContent.put(MovieColumns.POSTER_PATH, entity.posterPath);
+    movieContent.put(MovieColumns.IS_ADULT, entity.adult);
+    movieContent.put(MovieColumns.BACKDROP_PATH, entity.backdropPath);
+    movieContent.put(MovieColumns.ORIGINAL_LANGUAGE, entity.originalLanguage);
+    movieContent.put(MovieColumns.OVERVIEW, entity.overview);
+    movieContent.put(MovieColumns.POPULARITY, entity.popularity);
+    movieContent.put(MovieColumns.ORIGINAL_TITLE, entity.originalTitle);
+    movieContent.put(MovieColumns.RELEASE_DATE, entity.releaseDate);
+    movieContent.put(MovieColumns.HAS_VIDEO, entity.video);
+    movieContent.put(MovieColumns.VOTE_AVERAGE, entity.voteAverage);
+    movieContent.put(MovieColumns.VOTE_COUNT, entity.voteCount);
+    return movieContent;
+  }
 
   @Override public int describeContents() {
     return 0;

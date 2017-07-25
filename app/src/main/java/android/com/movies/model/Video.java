@@ -1,15 +1,10 @@
 package android.com.movies.model;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @SuppressWarnings("ALL")
-@Entity(tableName = "videos")
 public class Video {
-  @PrimaryKey
   @SerializedName("id")
   @Expose
   public String id;
@@ -34,6 +29,5 @@ public class Video {
   @SerializedName("type")
   @Expose
   public String type;
-  @ColumnInfo(name = "movie_id")
   public int movieId;
 }

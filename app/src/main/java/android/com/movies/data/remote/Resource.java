@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.com.movies.data;
+package android.com.movies.data.remote;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import static android.com.movies.data.Status.ERROR;
-import static android.com.movies.data.Status.LOADING;
-import static android.com.movies.data.Status.SUCCESS;
+import static android.com.movies.data.remote.Status.ERROR;
+import static android.com.movies.data.remote.Status.LOADING;
+import static android.com.movies.data.remote.Status.SUCCESS;
 
 /**
  * A generic class that holds a value with its loading status.

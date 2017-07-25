@@ -1,8 +1,5 @@
 package android.com.movies.ui.movie.detail;
 
-import android.arch.lifecycle.LifecycleRegistry;
-import android.arch.lifecycle.LifecycleRegistryOwner;
-import android.arch.lifecycle.ViewModelProviders;
 import android.com.movies.R;
 import android.com.movies.databinding.ActivityDetailsBinding;
 import android.com.movies.di.NetworkModule;
@@ -26,9 +23,8 @@ import static android.com.movies.ui.movie.MoviesActivity.EXTRA_MOVIE_IMAGE_TRANS
 import static android.com.movies.util.Utils.dpToPixel;
 
 public class MovieDetailsActivity extends AppCompatActivity
-    implements LifecycleRegistryOwner, TrailersAdapter.OnTrailerClickListener {
+    implements TrailersAdapter.OnTrailerClickListener {
 
-  private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
   private MovieViewModel movieViewModel;
   private TrailersAdapter trailersAdapter;
   private ReviewsAdapter reviewsAdapter;
@@ -39,7 +35,7 @@ public class MovieDetailsActivity extends AppCompatActivity
     ActivityDetailsBinding binding =
         DataBindingUtil.setContentView(this, R.layout.activity_details);
 
-    movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+    movieViewModel = null;/* ViewModelProviders.of(this).get(MovieViewModel.class);*/
 
     Bundle extras = getIntent().getExtras();
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -78,14 +74,14 @@ public class MovieDetailsActivity extends AppCompatActivity
           .noFade()
           .into(binding.ivPoster);
       subscribeUi();
-      movieViewModel.setMovieId(movie.id);
+      //movieViewModel.setMovieId(movie.id);
     } else {
       finish();
     }
   }
 
   private void subscribeUi() {
-    movieViewModel.getVideos().observe(this, trailers -> {
+ /*   movieViewModel.getVideos().observe(this, trailers -> {
       if (trailers != null && trailers.data != null) {
         trailersAdapter.setTrailers(trailers.data);
       }
@@ -94,7 +90,7 @@ public class MovieDetailsActivity extends AppCompatActivity
       if (reviews != null && reviews.data != null) {
         reviewsAdapter.setReviews(reviews.data);
       }
-    });
+    });*/
   }
 
   @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -105,10 +101,6 @@ public class MovieDetailsActivity extends AppCompatActivity
       default:
         return super.onOptionsItemSelected(item);
     }
-  }
-
-  @Override public LifecycleRegistry getLifecycle() {
-    return lifecycleRegistry;
   }
 
   @Override public void onClick(Video trailer) {

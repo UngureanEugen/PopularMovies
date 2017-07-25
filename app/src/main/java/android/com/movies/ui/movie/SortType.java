@@ -11,4 +11,5 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Retention(SOURCE) public @interface SortType {
   int TOP_RATED = 0;
   int MOST_POPULAR = 1;
+  int NOT_DEFINED = 2;
 }

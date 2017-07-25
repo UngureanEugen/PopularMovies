@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.com.movies.data;
+package android.com.movies.data.remote;
 
 /**
  * Status of a resource that is provided to the UI.

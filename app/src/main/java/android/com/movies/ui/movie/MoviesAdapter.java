@@ -4,6 +4,7 @@ import android.com.movies.R;
 import android.com.movies.di.NetworkModule;
 import android.com.movies.model.MovieEntity;
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,14 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
-import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewHolder> {
 
   private final MovieClickCallback movieClickCallback;
-  private List<MovieEntity> movies;
+  private Cursor cursor;
 
-  public MoviesAdapter(MovieClickCallback movieClickCallback) {
+  public MoviesAdapter(Cursor cursor, MovieClickCallback movieClickCallback) {
+    this.cursor = cursor;
     this.movieClickCallback = movieClickCallback;
   }
 
@@ -36,12 +37,22 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
 
   @Override
   public int getItemCount() {
-    return movies == null ? 0 : movies.size();
+    return (cursor != null) ? cursor.getCount() : 0;
   }
 
-  public void setMovies(List<MovieEntity> movies) {
-    this.movies = movies;
+  public void swapCursor(Cursor data) {
+    if (cursor != null) {
+      cursor.close();
+    }
+    cursor = data;
     notifyDataSetChanged();
+  }
+
+  public MovieEntity getMovie(int position) {
+    if (!cursor.moveToPosition(position)) {
+      throw new IllegalArgumentException("Invalid position");
+    }
+    return new MovieEntity(cursor);
   }
 
   public class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -58,16 +69,17 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
 
     public void bind(int position) {
       // set values
+      MovieEntity movieEntity = getMovie(position);
       Picasso.with(context)
-          .load(NetworkModule.IMAGE_URL + movies.get(position).posterPath)
+          .load(NetworkModule.IMAGE_URL + movieEntity.posterPath)
           .noFade()
           .into(ivPoster);
-      ViewCompat.setTransitionName(ivPoster, movies.get(position).title);
+      ViewCompat.setTransitionName(ivPoster, movieEntity.title);
     }
 
     @Override
     public void onClick(View v) {
-      movieClickCallback.onClick(movies.get(getAdapterPosition()), ivPoster);
+      movieClickCallback.onClick(getMovie(getAdapterPosition()), ivPoster);
     }
   }
 }

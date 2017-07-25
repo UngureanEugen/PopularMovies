@@ -1,11 +1,6 @@
 package android.com.movies.di;
 
 import android.app.Application;
-import android.arch.persistence.room.Room;
-import android.com.movies.data.local.AppDatabase;
-import android.com.movies.data.local.dao.MovieDao;
-import android.com.movies.data.remote.MovieService;
-import android.com.movies.repository.MovieRepository;
 import android.content.Context;
 import dagger.Module;
 import dagger.Provides;
@@ -31,7 +26,7 @@ public class AppModule {
     return app;
   }
 
-  @Provides
+/*  @Provides
   @Singleton
   public AppDatabase provideMovieDatabase(Context context) {
     // Reset the database to have new data on every run.
@@ -50,5 +45,5 @@ public class AppModule {
   @Singleton
   public MovieRepository provideMovieRepository(MovieDao dao, MovieService service) {
     return new MovieRepository(dao, service);
-  }
+  }*/
 }

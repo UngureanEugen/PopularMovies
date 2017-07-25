@@ -1,26 +1,6 @@
 package android.com.movies.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.com.movies.AppExecutors;
-import android.com.movies.data.NetworkBoundResource;
-import android.com.movies.data.Resource;
-import android.com.movies.data.local.dao.MovieDao;
-import android.com.movies.data.remote.ApiResponse;
-import android.com.movies.data.remote.MovieService;
-import android.com.movies.data.remote.movie.MovieReviewsResponse;
-import android.com.movies.data.remote.movie.MovieVideosResponse;
-import android.com.movies.data.remote.movie.MoviesResponse;
-import android.com.movies.model.MovieEntity;
-import android.com.movies.model.Review;
-import android.com.movies.model.Video;
-import android.com.movies.ui.movie.SortType;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import java.util.List;
-
-import static android.com.movies.ui.movie.SortType.MOST_POPULAR;
-
-public class MovieRepository {
+public class MovieRepository {/*
   private final MovieDao movieDao;
   private final MovieService movieService;
   private final AppExecutors appExecutors;
@@ -108,5 +88,5 @@ public class MovieRepository {
         return movieService.fetchReviews(String.valueOf(movieId));
       }
     }.asLiveData();
-  }
+}*/
 }

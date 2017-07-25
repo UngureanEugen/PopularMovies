@@ -1,15 +1,8 @@
-package android.com.movies.data.provider;
+package android.com.movies.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import static android.com.movies.data.provider.DatabaseContract.MovieColumns;
-import static android.com.movies.data.provider.DatabaseContract.ReviewColumns;
-import static android.com.movies.data.provider.DatabaseContract.TABLE_MOVIES;
-import static android.com.movies.data.provider.DatabaseContract.TABLE_REVIEWS;
-import static android.com.movies.data.provider.DatabaseContract.TABLE_TRAILERS;
-import static android.com.movies.data.provider.DatabaseContract.TrailerColumns;
 
 public class ProviderDatabaseHelper extends SQLiteOpenHelper {
   private static ProviderDatabaseHelper instance;
@@ -21,43 +14,43 @@ public class ProviderDatabaseHelper extends SQLiteOpenHelper {
           + " (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s BOOLEAN, %s BOOLEAN, %s TEXT, %s TEXT,"
           + "%s TEXT, %s DOUBLE, %s TEXT, %s TEXT, %s TEXT,   %s DOUBLE, %s INTEGER)",
       DatabaseContract.TABLE_MOVIES,
-      MovieColumns._ID,
-      MovieColumns.BACKDROP_PATH,
-      MovieColumns.HAS_VIDEO,
-      MovieColumns.IS_ADULT,
-      MovieColumns.ORIGINAL_LANGUAGE,
-      MovieColumns.ORIGINAL_TITLE,
-      MovieColumns.OVERVIEW,
-      MovieColumns.POPULARITY,
-      MovieColumns.POSTER_PATH,
-      MovieColumns.RELEASE_DATE,
-      MovieColumns.TITLE,
-      MovieColumns.VOTE_AVERAGE,
-      MovieColumns.VOTE_COUNT
+      DatabaseContract.MovieColumns._ID,
+      DatabaseContract.MovieColumns.BACKDROP_PATH,
+      DatabaseContract.MovieColumns.HAS_VIDEO,
+      DatabaseContract.MovieColumns.IS_ADULT,
+      DatabaseContract.MovieColumns.ORIGINAL_LANGUAGE,
+      DatabaseContract.MovieColumns.ORIGINAL_TITLE,
+      DatabaseContract.MovieColumns.OVERVIEW,
+      DatabaseContract.MovieColumns.POPULARITY,
+      DatabaseContract.MovieColumns.POSTER_PATH,
+      DatabaseContract.MovieColumns.RELEASE_DATE,
+      DatabaseContract.MovieColumns.TITLE,
+      DatabaseContract.MovieColumns.VOTE_AVERAGE,
+      DatabaseContract.MovieColumns.VOTE_COUNT
   );
 
   private static final String SQL_CREATE_TABLE_REVIEWS = String.format("CREATE TABLE %s"
           + " (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s INTEGER, %s TEXT)",
       DatabaseContract.TABLE_REVIEWS,
-      ReviewColumns._ID,
-      ReviewColumns.AUTHOR,
-      ReviewColumns.CONTENT,
-      ReviewColumns.MOVIE_ID,
-      ReviewColumns.URL
+      DatabaseContract.ReviewColumns._ID,
+      DatabaseContract.ReviewColumns.AUTHOR,
+      DatabaseContract.ReviewColumns.CONTENT,
+      DatabaseContract.ReviewColumns.MOVIE_ID,
+      DatabaseContract.ReviewColumns.URL
   );
 
   private static final String SQL_CREATE_TABLE_TRAILERS = String.format("CREATE TABLE %s"
           + " (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT,  %s TEXT, %s TEXT, %s INTEGER, %s TEXT, %s INTEGER, %s TEXT)",
       DatabaseContract.TABLE_TRAILERS,
-      TrailerColumns._ID,
-      TrailerColumns.ISO6391,
-      TrailerColumns.ISO31661,
-      TrailerColumns.KEY,
-      TrailerColumns.NAME,
-      TrailerColumns.MOVIE_ID,
-      TrailerColumns.SITE,
-      TrailerColumns.SIZE,
-      TrailerColumns.TYPE
+      DatabaseContract.TrailerColumns._ID,
+      DatabaseContract.TrailerColumns.ISO6391,
+      DatabaseContract.TrailerColumns.ISO31661,
+      DatabaseContract.TrailerColumns.KEY,
+      DatabaseContract.TrailerColumns.NAME,
+      DatabaseContract.TrailerColumns.MOVIE_ID,
+      DatabaseContract.TrailerColumns.SITE,
+      DatabaseContract.TrailerColumns.SIZE,
+      DatabaseContract.TrailerColumns.TYPE
   );
 
   public static synchronized ProviderDatabaseHelper getInstance(Context context) {
@@ -84,9 +77,9 @@ public class ProviderDatabaseHelper extends SQLiteOpenHelper {
 
   @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     if (oldVersion != newVersion) {
-      db.execSQL("DROP TABLE IF EXISTS " + TABLE_MOVIES);
-      db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEWS);
-      db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRAILERS);
+      db.execSQL("DROP TABLE IF EXISTS " + DatabaseContract.TABLE_MOVIES);
+      db.execSQL("DROP TABLE IF EXISTS " + DatabaseContract.TABLE_REVIEWS);
+      db.execSQL("DROP TABLE IF EXISTS " + DatabaseContract.TABLE_TRAILERS);
       onCreate(db);
     }
   }

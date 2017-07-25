@@ -1,4 +1,4 @@
-package android.com.movies.data.provider;
+package android.com.movies.data;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -10,14 +10,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import static android.com.movies.data.provider.DatabaseContract.CONTENT_AUTHORITY;
-import static android.com.movies.data.provider.DatabaseContract.CONTENT_URI;
-import static android.com.movies.data.provider.DatabaseContract.MovieColumns;
-import static android.com.movies.data.provider.DatabaseContract.PATH_FAVORITES;
-import static android.com.movies.data.provider.DatabaseContract.PATH_MOST_POPULAR;
-import static android.com.movies.data.provider.DatabaseContract.PATH_TOP_RATED;
-import static android.com.movies.data.provider.DatabaseContract.TABLE_MOVIES;
 
 public class MovieProvider extends ContentProvider {
 
@@ -35,23 +27,23 @@ public class MovieProvider extends ContentProvider {
 
   static {
     // content://android.com.movies/movies
-    sUriMatcher.addURI(CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES, MOVIES);
+    sUriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES, MOVIES);
 
     // content://android.com.movies/movies/id
-    sUriMatcher.addURI(CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES + "/#",
+    sUriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES + "/#",
         MOVIE_WITH_ID);
 
     // content://android.com.movies/movies/top_rated
-    sUriMatcher.addURI(CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES + "/" +
-        PATH_TOP_RATED, TOP_RATED_MOVIES);
+    sUriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES + "/" +
+        DatabaseContract.PATH_TOP_RATED, TOP_RATED_MOVIES);
 
     // content://android.com.movies/movies/most_popular
-    sUriMatcher.addURI(CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES + "/" +
-        PATH_MOST_POPULAR, MOST_POPULAR_MOVIES);
+    sUriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES + "/" +
+        DatabaseContract.PATH_MOST_POPULAR, MOST_POPULAR_MOVIES);
 
     // content://android.com.movies/movies/favorites
-    sUriMatcher.addURI(CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES + "/" +
-        PATH_FAVORITES, FAVORITES_MOVIES);
+    sUriMatcher.addURI(DatabaseContract.CONTENT_AUTHORITY, DatabaseContract.TABLE_MOVIES + "/" +
+        DatabaseContract.PATH_FAVORITES, FAVORITES_MOVIES);
   }
 
   @Override public boolean onCreate() {
@@ -70,7 +62,7 @@ public class MovieProvider extends ContentProvider {
         break;
       case MOVIE_WITH_ID:
         long id = ContentUris.parseId(uri);
-        selection = String.format("%s = ?", MovieColumns._ID);
+        selection = String.format("%s = ?", DatabaseContract.MovieColumns._ID);
         selectionArgs = new String[] {String.valueOf(id)};
         break;
       default:
@@ -94,9 +86,9 @@ public class MovieProvider extends ContentProvider {
     Uri returnUri;
     switch (match) {
       case MOVIES:
-        long id = db.insert(TABLE_MOVIES, null, values);
+        long id = db.insert(DatabaseContract.TABLE_MOVIES, null, values);
         if (id > 0) {
-          returnUri = ContentUris.withAppendedId(CONTENT_URI, id);
+          returnUri = ContentUris.withAppendedId(DatabaseContract.CONTENT_URI, id);
         } else {
           throw new SQLException("Failed to insert row into " + uri);
         }
@@ -116,14 +108,14 @@ public class MovieProvider extends ContentProvider {
         break;
       case MOVIE_WITH_ID:
         long id = ContentUris.parseId(uri);
-        selection = String.format("%s = ?", MovieColumns._ID);
+        selection = String.format("%s = ?", DatabaseContract.MovieColumns._ID);
         selectionArgs = new String[] {String.valueOf(id)};
         break;
       default:
         throw new IllegalArgumentException("Illegal delete URI");
     }
     SQLiteDatabase db = mDbHelper.getWritableDatabase();
-    int count = db.delete(TABLE_MOVIES, selection, selectionArgs);
+    int count = db.delete(DatabaseContract.TABLE_MOVIES, selection, selectionArgs);
     if (count > 0) {
       getContext().getContentResolver().notifyChange(uri, null);
     }
@@ -136,14 +128,14 @@ public class MovieProvider extends ContentProvider {
     switch (sUriMatcher.match(uri)) {
       case MOVIE_WITH_ID:
         long id = ContentUris.parseId(uri);
-        selection = String.format("%s = ? ", MovieColumns._ID);
+        selection = String.format("%s = ? ", DatabaseContract.MovieColumns._ID);
         selectionArgs = new String[] {String.valueOf(id)};
         break;
       default:
         throw new IllegalArgumentException("Illegal update URI");
     }
     SQLiteDatabase db = mDbHelper.getWritableDatabase();
-    int count = db.update(TABLE_MOVIES, values, selection, selectionArgs);
+    int count = db.update(DatabaseContract.TABLE_MOVIES, values, selection, selectionArgs);
     if (count > 0) {
       getContext().getContentResolver().notifyChange(uri, null);
     }
