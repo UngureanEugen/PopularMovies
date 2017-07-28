@@ -3,10 +3,9 @@ package android.com.movies.ui.movie;
 import android.annotation.SuppressLint;
 import android.com.movies.R;
 import android.com.movies.data.DatabaseContract;
-import android.com.movies.data.remote.MovieService;
 import android.com.movies.databinding.ActivityMoviesBinding;
 import android.com.movies.model.MovieEntity;
-import android.com.movies.repository.MovieRepository;
+import android.com.movies.sync.SyncUtil;
 import android.com.movies.ui.movie.detail.MovieDetailsActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,7 +23,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import javax.inject.Inject;
 
 import static android.com.movies.ui.movie.SortType.MOST_POPULAR;
 import static android.com.movies.ui.movie.SortType.TOP_RATED;
@@ -34,11 +32,6 @@ public class MoviesActivity extends AppCompatActivity
 
   public static final int MOVIE_LOADER_ID = 0;
 
-  @Inject
-  MovieRepository repository;
-  @Inject
-  MovieService service;
-
   public static final String EXTRA_MOVIE_IMAGE_TRANSITION = "movieImageTransition";
   public static final String EXTRA_MOVIE = "movie";
   private static final String SORT_KEY = "currentSort";
@@ -47,6 +40,7 @@ public class MoviesActivity extends AppCompatActivity
   private MoviesAdapter moviesAdapter;
   private SharedPreferences sharedPreferences;
   private @SortType int currentSortType;
+  private CursorLoader loader;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +60,7 @@ public class MoviesActivity extends AppCompatActivity
     currentSortType = sharedPreferences.getInt(SORT_KEY, TOP_RATED);
 
     getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, savedInstanceState, this);
-    //subscribeUi();
-    setSortType(currentSortType);
+    SyncUtil.initMoviesSync(this, currentSortType);
   }
 
   @Override
@@ -111,58 +104,18 @@ public class MoviesActivity extends AppCompatActivity
   private void setSortType(@SortType int type) {
     binding.moviesList.scrollToPosition(0);
     currentSortType = type;
+    if (loader != null) {
+      loader.setSortOrder(DatabaseContract.getSort(currentSortType));
+      loader.forceLoad();
+    }
+    SyncUtil.startMoviesImmediateSync(this, type);
   }
-
-  //private void subscribeUi() {
-  //  movieViewModel.getMovies().observe(this, resource -> {
-  //    if (resource != null && resource.data != null) {
-  //      binding.setIsLoading(false);
-  //      moviesAdapter.setMovies(resource.data);
-  //    } else {
-  //      binding.setIsLoading(true);
-  //    }
-  //  });
-  //}
 
   @SuppressLint("StaticFieldLeak") @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-    return new CursorLoader(this, DatabaseContract.CONTENT_URI, null, null, null, "");
-  /*  String sortType = "";
-    List<MovieEntity> movies = new ArrayList<>(0);
-    return new AsyncTaskLoader(this) {
-
-      @Override protected void onStartLoading() {
-        if (!movies.isEmpty()) {
-          deliverResult(movies);
-        } else {
-          binding.setIsLoading(true);
-          forceLoad();
-        }
-      }
-
-      @Override public List<MovieEntity> loadInBackground() {
-        List<MovieEntity> responseMovies = new ArrayList<>(0);
-        service.fetchMovies(sortType).enqueue(new Callback<ApiResponse<MoviesResponse>>() {
-          @Override public void onResponse(Call<ApiResponse<MoviesResponse>> call,
-              Response<ApiResponse<MoviesResponse>> response) {
-            if (response.isSuccessful()
-                && response.body() != null
-                && response.body().body != null) {
-              responseMovies.addAll(response.body().body.movies);
-            } else {
-              Toast.makeText(MoviesActivity.this, response.body().errorMessage, Toast.LENGTH_SHORT)
-                  .show();
-            }
-          }
-
-          @Override public void onFailure(Call<ApiResponse<MoviesResponse>> call, Throwable t) {
-            binding.setIsLoading(false);
-            Toast.makeText(MoviesActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-          }
-        });
-        return responseMovies;
-      }
-    };*/
+    loader = new CursorLoader(this, DatabaseContract.CONTENT_URI_MOVIES, null, null, null,
+        DatabaseContract.getSort(currentSortType));
+    return loader;
   }
 
   @Override public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

@@ -6,7 +6,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import java.util.UUID;
 
 import static android.com.movies.data.DatabaseContract.MovieColumns;
 import static android.com.movies.data.DatabaseContract.getColumnDouble;
@@ -55,24 +54,26 @@ public class MovieEntity implements Parcelable {
   @SerializedName("release_date")
   @Expose
   public String releaseDate;
+  public Boolean isFavorite;
 
   public MovieEntity() {
   }
 
-  public MovieEntity(String title) {
-    this.voteCount = 0;
-    this.id = UUID.randomUUID().hashCode();
-    this.video = false;
-    this.voteAverage = 0d;
-    this.title = title;
-    this.popularity = 0d;
-    this.posterPath = "";
-    this.originalLanguage = "";
-    this.originalTitle = "";
-    this.backdropPath = "";
-    this.adult = false;
-    this.overview = "";
-    this.releaseDate = "";
+  public MovieEntity(Cursor cursor) {
+    this.id = getColumnInt(cursor, MovieColumns._ID);
+    this.title = getColumnString(cursor, MovieColumns.TITLE);
+    this.posterPath = getColumnString(cursor, MovieColumns.POSTER_PATH);
+    this.adult = getColumnInt(cursor, MovieColumns.IS_ADULT) == 1;
+    this.backdropPath = getColumnString(cursor, MovieColumns.BACKDROP_PATH);
+    this.originalLanguage = getColumnString(cursor, MovieColumns.ORIGINAL_LANGUAGE);
+    this.overview = getColumnString(cursor, MovieColumns.OVERVIEW);
+    this.popularity = getColumnDouble(cursor, MovieColumns.POPULARITY);
+    this.originalTitle = getColumnString(cursor, MovieColumns.ORIGINAL_TITLE);
+    this.releaseDate = getColumnString(cursor, MovieColumns.RELEASE_DATE);
+    this.video = getColumnInt(cursor, MovieColumns.HAS_VIDEO) == 1;
+    this.voteAverage = getColumnDouble(cursor, MovieColumns.VOTE_AVERAGE);
+    this.voteCount = getColumnInt(cursor, MovieColumns.VOTE_COUNT);
+    this.isFavorite = getColumnInt(cursor, MovieColumns.IS_FAVORITE) == 1;
   }
 
   protected MovieEntity(Parcel in) {
@@ -107,60 +108,12 @@ public class MovieEntity implements Parcelable {
     adult = tmpAdult == 0 ? null : tmpAdult == 1;
     overview = in.readString();
     releaseDate = in.readString();
+    byte tmpIsFavorite = in.readByte();
+    isFavorite = tmpIsFavorite == 0 ? null : tmpIsFavorite == 1;
   }
 
-  public static final Creator<MovieEntity> CREATOR = new Creator<MovieEntity>() {
-    @Override
-    public MovieEntity createFromParcel(Parcel in) {
-      return new MovieEntity(in);
-    }
-
-    @Override
-    public MovieEntity[] newArray(int size) {
-      return new MovieEntity[size];
-    }
-  };
-
-  public MovieEntity(Cursor cursor) {
-    this.id = getColumnInt(cursor, MovieColumns._ID);
-    this.title = getColumnString(cursor, MovieColumns.TITLE);
-    this.posterPath = getColumnString(cursor, MovieColumns.POSTER_PATH);
-    this.adult = getColumnInt(cursor, MovieColumns.IS_ADULT) == 1;
-    this.backdropPath = getColumnString(cursor, MovieColumns.BACKDROP_PATH);
-    this.originalLanguage = getColumnString(cursor, MovieColumns.ORIGINAL_LANGUAGE);
-    this.overview = getColumnString(cursor, MovieColumns.OVERVIEW);
-    this.popularity = getColumnDouble(cursor, MovieColumns.POPULARITY);
-    this.originalTitle = getColumnString(cursor, MovieColumns.ORIGINAL_TITLE);
-    this.releaseDate = getColumnString(cursor, MovieColumns.RELEASE_DATE);
-    this.video = getColumnInt(cursor, MovieColumns.HAS_VIDEO) == 1;
-    this.voteAverage = getColumnDouble(cursor, MovieColumns.VOTE_AVERAGE);
-    this.voteCount = getColumnInt(cursor, MovieColumns.VOTE_COUNT);
-  }
-
-  public static ContentValues convert(MovieEntity entity) {
-    ContentValues movieContent = new ContentValues();
-    movieContent.put(MovieColumns._ID, entity.id);
-    movieContent.put(MovieColumns.TITLE, entity.title);
-    movieContent.put(MovieColumns.POSTER_PATH, entity.posterPath);
-    movieContent.put(MovieColumns.IS_ADULT, entity.adult);
-    movieContent.put(MovieColumns.BACKDROP_PATH, entity.backdropPath);
-    movieContent.put(MovieColumns.ORIGINAL_LANGUAGE, entity.originalLanguage);
-    movieContent.put(MovieColumns.OVERVIEW, entity.overview);
-    movieContent.put(MovieColumns.POPULARITY, entity.popularity);
-    movieContent.put(MovieColumns.ORIGINAL_TITLE, entity.originalTitle);
-    movieContent.put(MovieColumns.RELEASE_DATE, entity.releaseDate);
-    movieContent.put(MovieColumns.HAS_VIDEO, entity.video);
-    movieContent.put(MovieColumns.VOTE_AVERAGE, entity.voteAverage);
-    movieContent.put(MovieColumns.VOTE_COUNT, entity.voteCount);
-    return movieContent;
-  }
-
-  @Override public int describeContents() {
-    return 0;
-  }
-
-  @Override public void writeToParcel(Parcel dest, int flags) {
-
+  @Override
+  public void writeToParcel(Parcel dest, int flags) {
     if (voteCount == null) {
       dest.writeByte((byte) 0);
     } else {
@@ -194,5 +147,42 @@ public class MovieEntity implements Parcelable {
     dest.writeByte((byte) (adult == null ? 0 : adult ? 1 : 2));
     dest.writeString(overview);
     dest.writeString(releaseDate);
+    dest.writeByte((byte) (isFavorite == null ? 0 : isFavorite ? 1 : 2));
+  }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  public static final Creator<MovieEntity> CREATOR = new Creator<MovieEntity>() {
+    @Override
+    public MovieEntity createFromParcel(Parcel in) {
+      return new MovieEntity(in);
+    }
+
+    @Override
+    public MovieEntity[] newArray(int size) {
+      return new MovieEntity[size];
+    }
+  };
+
+  public static ContentValues convert(MovieEntity entity) {
+    ContentValues movieContent = new ContentValues();
+    movieContent.put(MovieColumns._ID, entity.id);
+    movieContent.put(MovieColumns.TITLE, entity.title);
+    movieContent.put(MovieColumns.POSTER_PATH, entity.posterPath);
+    movieContent.put(MovieColumns.IS_ADULT, entity.adult);
+    movieContent.put(MovieColumns.BACKDROP_PATH, entity.backdropPath);
+    movieContent.put(MovieColumns.ORIGINAL_LANGUAGE, entity.originalLanguage);
+    movieContent.put(MovieColumns.OVERVIEW, entity.overview);
+    movieContent.put(MovieColumns.POPULARITY, entity.popularity);
+    movieContent.put(MovieColumns.ORIGINAL_TITLE, entity.originalTitle);
+    movieContent.put(MovieColumns.RELEASE_DATE, entity.releaseDate);
+    movieContent.put(MovieColumns.HAS_VIDEO, entity.video);
+    movieContent.put(MovieColumns.VOTE_AVERAGE, entity.voteAverage);
+    movieContent.put(MovieColumns.VOTE_COUNT, entity.voteCount);
+    movieContent.put(MovieColumns.IS_FAVORITE, entity.isFavorite);
+    return movieContent;
   }
 }

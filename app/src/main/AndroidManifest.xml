@@ -23,7 +23,18 @@
       <meta-data android:name="android.support.PARENT_ACTIVITY"
           android:value=".ui.movie.MoviesActivity"/>
     </activity>
-    <service android:name=".sync.SyncMoviesJobService"/>
+    <provider
+        android:name=".data.MovieProvider"
+        android:authorities="@string/content_authority"
+        android:exported="false"/>
+    <service android:name=".sync.SyncService" android:exported="false"/>
+    <service
+        android:name=".sync.SyncMoviesJobService"
+        android:exported="false">
+      <intent-filter>
+        <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+      </intent-filter>
+    </service>
   </application>
 
 </manifest>

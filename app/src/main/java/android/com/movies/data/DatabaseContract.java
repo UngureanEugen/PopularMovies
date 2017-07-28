@@ -1,5 +1,6 @@
 package android.com.movies.data;
 
+import android.com.movies.ui.movie.SortType;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -29,6 +30,7 @@ public class DatabaseContract {
     public static final String IS_ADULT = "is_adult";
     public static final String OVERVIEW = "overview";
     public static final String RELEASE_DATE = "release_date";
+    public static final String IS_FAVORITE = "is_favorite";
   }
 
   public static final class ReviewColumns implements BaseColumns {
@@ -49,10 +51,41 @@ public class DatabaseContract {
     public static final String MOVIE_ID = "movie_id";
   }
 
-  public static final Uri CONTENT_URI = new Uri.Builder().scheme("content")
+  private static final String MOST_POPULAR_SORT = String.format("%s ASC, %s DESC, %s ASC",
+      MovieColumns.VOTE_AVERAGE, MovieColumns.POPULARITY, MovieColumns.IS_FAVORITE);
+  private static final String TOP_RATED_SORT = String.format("%s DESC, %s ASC, %s ASC",
+      MovieColumns.VOTE_AVERAGE, MovieColumns.POPULARITY, MovieColumns.IS_FAVORITE);
+  private static final String FAVORITE_SORT = String.format("%s ASC, %s ASC, %s DESC",
+      MovieColumns.VOTE_AVERAGE, MovieColumns.POPULARITY, MovieColumns.IS_FAVORITE);
+
+  public static final Uri CONTENT_URI_MOVIES = new Uri.Builder().scheme("content")
       .authority(CONTENT_AUTHORITY)
       .appendPath(TABLE_MOVIES)
       .build();
+
+  public static final Uri CONTENT_URI_REVIEWS = new Uri.Builder().scheme("content")
+      .authority(CONTENT_AUTHORITY)
+      .appendPath(TABLE_REVIEWS)
+      .build();
+
+  public static final Uri CONTENT_URI_TRAILERS = new Uri.Builder().scheme("content")
+      .authority(CONTENT_AUTHORITY)
+      .appendPath(TABLE_TRAILERS)
+      .build();
+
+  public static String getSort(@SortType int type) {
+    switch (type) {
+      case SortType.FAVORITES:
+        return FAVORITE_SORT;
+      case SortType.MOST_POPULAR:
+        return MOST_POPULAR_SORT;
+      case SortType.NOT_DEFINED:
+      case SortType.TOP_RATED:
+        return TOP_RATED_SORT;
+      default:
+        return null;
+    }
+  }
 
   public static String getColumnString(Cursor cursor, String columnName) {
     return cursor.getString(cursor.getColumnIndex(columnName));

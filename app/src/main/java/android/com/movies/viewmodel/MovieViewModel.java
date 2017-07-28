@@ -1,5 +1,6 @@
 package android.com.movies.viewmodel;
 
+// TODO: 7/26/17 remove
 public class MovieViewModel {/*extends AndroidViewModel {
 
   private final MutableLiveData<Integer> sortType = new MutableLiveData<>();

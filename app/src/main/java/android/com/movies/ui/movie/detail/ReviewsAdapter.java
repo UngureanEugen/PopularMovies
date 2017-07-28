@@ -2,16 +2,15 @@ package android.com.movies.ui.movie.detail;
 
 import android.com.movies.R;
 import android.com.movies.model.Review;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewViewHolder> {
-  private List<Review> reviews = new ArrayList<>(0);
+  private Cursor reviewsCursor;
 
   @Override
   public ReviewViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -25,7 +24,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
   }
 
   @Override public int getItemCount() {
-    return reviews.size();
+    return (reviewsCursor != null) ? reviewsCursor.getCount() : 0;
   }
 
   public class ReviewViewHolder extends RecyclerView.ViewHolder {
@@ -37,13 +36,22 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
     }
 
     public void bind(int position) {
-      tvReview.setText(reviews.get(position).content);
+      tvReview.setText(getReview(position).content);
     }
   }
 
-  public void setReviews(List<Review> items) {
-    reviews.clear();
-    reviews.addAll(items);
+  public void swapReviewsCursor(Cursor data) {
+    if (reviewsCursor != null) {
+      reviewsCursor.close();
+    }
+    reviewsCursor = data;
     notifyDataSetChanged();
+  }
+
+  public Review getReview(int position) {
+    if (!reviewsCursor.moveToPosition(position)) {
+      throw new IllegalArgumentException("Invalid position");
+    }
+    return new Review(reviewsCursor);
   }
 }

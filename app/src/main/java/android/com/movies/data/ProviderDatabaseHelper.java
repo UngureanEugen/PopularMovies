@@ -12,7 +12,7 @@ public class ProviderDatabaseHelper extends SQLiteOpenHelper {
 
   private static final String SQL_CREATE_TABLE_MOVIES = String.format("CREATE TABLE %s"
           + " (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s BOOLEAN, %s BOOLEAN, %s TEXT, %s TEXT,"
-          + "%s TEXT, %s DOUBLE, %s TEXT, %s TEXT, %s TEXT,   %s DOUBLE, %s INTEGER)",
+          + "%s TEXT, %s DOUBLE, %s TEXT, %s TEXT, %s TEXT,   %s DOUBLE, %s INTEGER, %s BOOLEAN)",
       DatabaseContract.TABLE_MOVIES,
       DatabaseContract.MovieColumns._ID,
       DatabaseContract.MovieColumns.BACKDROP_PATH,
@@ -26,11 +26,12 @@ public class ProviderDatabaseHelper extends SQLiteOpenHelper {
       DatabaseContract.MovieColumns.RELEASE_DATE,
       DatabaseContract.MovieColumns.TITLE,
       DatabaseContract.MovieColumns.VOTE_AVERAGE,
-      DatabaseContract.MovieColumns.VOTE_COUNT
+      DatabaseContract.MovieColumns.VOTE_COUNT,
+      DatabaseContract.MovieColumns.IS_FAVORITE
   );
 
   private static final String SQL_CREATE_TABLE_REVIEWS = String.format("CREATE TABLE %s"
-          + " (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s INTEGER, %s TEXT)",
+          + " (%s TEXT PRIMARY KEY, %s TEXT, %s TEXT, %s INTEGER, %s TEXT)",
       DatabaseContract.TABLE_REVIEWS,
       DatabaseContract.ReviewColumns._ID,
       DatabaseContract.ReviewColumns.AUTHOR,
@@ -40,7 +41,7 @@ public class ProviderDatabaseHelper extends SQLiteOpenHelper {
   );
 
   private static final String SQL_CREATE_TABLE_TRAILERS = String.format("CREATE TABLE %s"
-          + " (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT,  %s TEXT, %s TEXT, %s INTEGER, %s TEXT, %s INTEGER, %s TEXT)",
+          + " (%s TEXT PRIMARY KEY, %s TEXT, %s TEXT,  %s TEXT, %s TEXT, %s INTEGER, %s TEXT, %s INTEGER, %s TEXT)",
       DatabaseContract.TABLE_TRAILERS,
       DatabaseContract.TrailerColumns._ID,
       DatabaseContract.TrailerColumns.ISO6391,

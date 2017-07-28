@@ -3,19 +3,18 @@ package android.com.movies.ui.movie.detail;
 import android.com.movies.R;
 import android.com.movies.model.Video;
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.TrailerViewHolder> {
-  private final List<Video> trailers = new ArrayList<>(0);
+  private Cursor trailersCursor;
   private final OnTrailerClickListener onTrailerClickListener;
 
-  public TrailersAdapter(OnTrailerClickListener onTrailerClickListener) {
+  public TrailersAdapter( OnTrailerClickListener onTrailerClickListener) {
     this.onTrailerClickListener = onTrailerClickListener;
   }
 
@@ -31,7 +30,22 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
   }
 
   @Override public int getItemCount() {
-    return trailers.size();
+    return (trailersCursor != null) ? trailersCursor.getCount() : 0;
+  }
+
+  public void swapTrailersCursor(Cursor data) {
+    if (trailersCursor != null) {
+      trailersCursor.close();
+    }
+    trailersCursor = data;
+    notifyDataSetChanged();
+  }
+
+  public Video getTrailer(int position) {
+    if (!trailersCursor.moveToPosition(position)) {
+      throw new IllegalArgumentException("Invalid position");
+    }
+    return new Video(trailersCursor);
   }
 
   public class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -50,14 +64,8 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
     }
 
     @Override public void onClick(View v) {
-      onTrailerClickListener.onClick(trailers.get(getAdapterPosition()));
+      onTrailerClickListener.onClick(getTrailer(getAdapterPosition()));
     }
-  }
-
-  public void setTrailers(List<Video> items) {
-    trailers.clear();
-    trailers.addAll(items);
-    notifyDataSetChanged();
   }
 
   public interface OnTrailerClickListener {

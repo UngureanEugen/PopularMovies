@@ -4,6 +4,7 @@
   <string name="menu_sort">Sort</string>
   <string name="action_most_popular">Most Popular</string>
   <string name="action_top_rated">Top Rated</string>
+  <string name="action_favorites">Favorites</string>
   <string name="mark_favorite">mark as\n favorite</string>
   <string name="poster">poster</string>
   <string name="trailers">Trailers:</string>
@@ -18,4 +19,6 @@
   <string name="trailer">Trailer %d</string>
   <string name="intent_title">Open with</string>
   <string name="reviews">Reviews:</string>
+
+  <string name="content_authority">android.com.movies</string>
 </resources>

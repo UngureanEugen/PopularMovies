@@ -1,7 +1,6 @@
 package android.com.movies.sync;
 
 import android.com.movies.data.DatabaseContract;
-import android.com.movies.data.remote.ApiResponse;
 import android.com.movies.data.remote.MovieService;
 import android.com.movies.data.remote.movie.MoviesResponse;
 import android.com.movies.util.AppExecutors;
@@ -28,14 +27,14 @@ public class SyncMoviesJobService extends JobService {
     Bundle bundle = job.getExtras();
     if (bundle != null) {
       Cursor cursor = context.getContentResolver().query(
-          DatabaseContract.CONTENT_URI, null, null, null, null);
+          DatabaseContract.CONTENT_URI_MOVIES, null, null, null, null);
       if (cursor != null) {
 
       }
       String key = bundle.getString("", "");
       executors.networkIO().execute(() -> {
         try {
-          Response<ApiResponse<MoviesResponse>> response = movieService.fetchMovies(key).execute();
+          Response<MoviesResponse> response = movieService.fetchMovies(key).execute();
         } catch (IOException e) {
           e.printStackTrace();
         }
