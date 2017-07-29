@@ -23,6 +23,11 @@
       <meta-data android:name="android.support.PARENT_ACTIVITY"
           android:value=".ui.movie.MoviesActivity"/>
     </activity>
+    <provider
+        android:name=".data.MovieProvider"
+        android:authorities="@string/content_authority"
+        android:exported="false"/>
+    <service android:name=".sync.SyncService" android:exported="false"/>
   </application>
 
 </manifest>

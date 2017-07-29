@@ -1,19 +1,22 @@
 package android.com.movies.ui.movie;
 
-import android.arch.lifecycle.LifecycleRegistry;
-import android.arch.lifecycle.LifecycleRegistryOwner;
-import android.arch.lifecycle.ViewModelProviders;
+import android.annotation.SuppressLint;
 import android.com.movies.R;
+import android.com.movies.data.DatabaseContract;
 import android.com.movies.databinding.ActivityMoviesBinding;
 import android.com.movies.model.MovieEntity;
+import android.com.movies.sync.SyncUtil;
 import android.com.movies.ui.movie.detail.MovieDetailsActivity;
-import android.com.movies.viewmodel.MovieViewModel;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -21,20 +24,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
-import static android.arch.lifecycle.Lifecycle.State.STARTED;
+import static android.com.movies.ui.movie.SortType.FAVORITES;
 import static android.com.movies.ui.movie.SortType.MOST_POPULAR;
 import static android.com.movies.ui.movie.SortType.TOP_RATED;
 
 public class MoviesActivity extends AppCompatActivity
-    implements LifecycleRegistryOwner, MovieClickCallback {
+    implements LoaderManager.LoaderCallbacks<Cursor>, MovieClickCallback {
 
-  private static final String SORT_KEY = "currentSort";
+  public static final int MOVIE_LOADER_ID = 0;
+
   public static final String EXTRA_MOVIE_IMAGE_TRANSITION = "movieImageTransition";
   public static final String EXTRA_MOVIE = "movie";
+  private static final String SORT_KEY = "currentSort";
 
-  private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
   private ActivityMoviesBinding binding;
-  private MovieViewModel movieViewModel;
   private MoviesAdapter moviesAdapter;
   private SharedPreferences sharedPreferences;
   private @SortType int currentSortType;
@@ -43,7 +46,7 @@ public class MoviesActivity extends AppCompatActivity
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     binding = DataBindingUtil.setContentView(this, R.layout.activity_movies);
-    moviesAdapter = new MoviesAdapter(this);
+    moviesAdapter = new MoviesAdapter(null, this);
     binding.moviesList.setAdapter(moviesAdapter);
     binding.moviesList.setHasFixedSize(true);
 
@@ -52,30 +55,22 @@ public class MoviesActivity extends AppCompatActivity
     } else {
       binding.moviesList.setLayoutManager(new GridLayoutManager(this, 3));
     }
-    movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
     sharedPreferences = getSharedPreferences("movie-prefs", MODE_PRIVATE);
     currentSortType = sharedPreferences.getInt(SORT_KEY, TOP_RATED);
-
-    subscribeUi();
-    setSortType(currentSortType);
-  }
-
-  @Override
-  public LifecycleRegistry getLifecycle() {
-    return lifecycleRegistry;
+    binding.setIsLoading(true);
+    getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, savedInstanceState, this);
+    SyncUtil.initMoviesSync(this, currentSortType);
   }
 
   @Override
   public void onClick(MovieEntity movie, ImageView sharedView) {
-    if (getLifecycle().getCurrentState().isAtLeast(STARTED)) {
-      Intent intent = new Intent(this, MovieDetailsActivity.class);
-      intent.putExtra(EXTRA_MOVIE, movie);
-      intent.putExtra(EXTRA_MOVIE_IMAGE_TRANSITION, ViewCompat.getTransitionName(sharedView));
-      ActivityOptionsCompat options = ActivityOptionsCompat
-          .makeSceneTransitionAnimation(this, sharedView, ViewCompat.getTransitionName(sharedView));
-      startActivity(intent, options.toBundle());
-    }
+    Intent intent = new Intent(this, MovieDetailsActivity.class);
+    intent.putExtra(EXTRA_MOVIE, movie);
+    intent.putExtra(EXTRA_MOVIE_IMAGE_TRANSITION, ViewCompat.getTransitionName(sharedView));
+    ActivityOptionsCompat options = ActivityOptionsCompat
+        .makeSceneTransitionAnimation(this, sharedView, ViewCompat.getTransitionName(sharedView));
+    startActivity(intent, options.toBundle());
   }
 
   @Override public boolean onCreateOptionsMenu(Menu menu) {
@@ -90,6 +85,9 @@ public class MoviesActivity extends AppCompatActivity
         return true;
       case R.id.actionSortMostPopular:
         setSortType(MOST_POPULAR);
+        return true;
+      case R.id.actionSortFavorites:
+        setSortType(FAVORITES);
         return true;
       case android.R.id.home:
         supportFinishAfterTransition();
@@ -107,19 +105,27 @@ public class MoviesActivity extends AppCompatActivity
   }
 
   private void setSortType(@SortType int type) {
+    binding.setIsLoading(true);
     binding.moviesList.scrollToPosition(0);
-    movieViewModel.setSortType(type);
     currentSortType = type;
+    getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
+    SyncUtil.startMoviesImmediateSync(this, type);
   }
 
-  private void subscribeUi() {
-    movieViewModel.getMovies().observe(this, resource -> {
-      if (resource != null && resource.data != null) {
-        binding.setIsLoading(false);
-        moviesAdapter.setMovies(resource.data);
-      } else {
-        binding.setIsLoading(true);
-      }
-    });
+  @SuppressLint("StaticFieldLeak") @Override
+  public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    return new CursorLoader(this, DatabaseContract.CONTENT_URI_MOVIES, null, null, null,
+        DatabaseContract.getSort(currentSortType));
+  }
+
+  @Override public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    if (data != null && data.getCount() > 0) {
+      binding.setIsLoading(false);
+    }
+    moviesAdapter.swapCursor(data);
+  }
+
+  @Override public void onLoaderReset(Loader loader) {
+    moviesAdapter.swapCursor(null);
   }
 }

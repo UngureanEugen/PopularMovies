@@ -1,7 +1,6 @@
 package android.com.movies.di;
 
 import android.com.movies.data.remote.MovieService;
-import android.com.movies.util.LiveDataCallAdapterFactory;
 import android.com.movies.util.RequestInterceptor;
 import dagger.Module;
 import dagger.Provides;
@@ -34,7 +33,6 @@ public class NetworkModule {
     return new Retrofit.Builder()
         .baseUrl(URL)
         .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(new LiveDataCallAdapterFactory())
         .client(client)
         .build();
   }

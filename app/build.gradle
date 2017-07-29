@@ -57,19 +57,6 @@ dependencies {
   compile 'com.google.dagger:dagger:' + rootProject.daggerVersion
   annotationProcessor 'com.google.dagger:dagger-compiler:' + rootProject.daggerVersion
 
-  //lifecycle
-  compile "android.arch.lifecycle:runtime:" + rootProject.lifecycleVersion
-  compile "android.arch.lifecycle:extensions:" + rootProject.lifecycleVersion
-  annotationProcessor "android.arch.lifecycle:compiler:" + rootProject.lifecycleVersion
-
-  //room
-  compile "android.arch.persistence.room:runtime:" + rootProject.lifecycleVersion
-  annotationProcessor "android.arch.persistence.room:compiler:" + rootProject.lifecycleVersion
-
-  //testing room
-  testCompile "android.arch.persistence.room:testing:" + rootProject.lifecycleVersion
-  androidTestImplementation "android.arch.persistence.room:testing:" + rootProject.lifecycleVersion
-
   //Mockito
   testCompile "org.mockito:mockito-core:" + rootProject.mockitoVersion
   androidTestCompile("android.arch.core:core-testing:" + rootProject.lifecycleVersion, {})

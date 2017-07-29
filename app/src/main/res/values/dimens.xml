@@ -4,4 +4,5 @@
   <dimen name="margin_default">16dp</dimen>
   <dimen name="title_text_size">36sp</dimen>
   <dimen name="layout_title_height">130dp</dimen>
+  <dimen name="item_height">70dp</dimen>
 </resources>
