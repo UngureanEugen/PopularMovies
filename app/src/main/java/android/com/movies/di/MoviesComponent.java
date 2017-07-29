@@ -5,7 +5,7 @@ import dagger.Component;
 import javax.inject.Singleton;
 
 @Singleton()
-@Component(modules = {AppModule.class, NetworkModule.class})
+@Component(modules = {NetworkModule.class})
 public interface MoviesComponent {
   void inject(SyncService syncService);
 }

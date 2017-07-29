@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import static android.com.movies.ui.movie.SortType.FAVORITES;
 import static android.com.movies.ui.movie.SortType.MOST_POPULAR;
 import static android.com.movies.ui.movie.SortType.TOP_RATED;
 
@@ -40,7 +41,6 @@ public class MoviesActivity extends AppCompatActivity
   private MoviesAdapter moviesAdapter;
   private SharedPreferences sharedPreferences;
   private @SortType int currentSortType;
-  private CursorLoader loader;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,7 @@ public class MoviesActivity extends AppCompatActivity
 
     sharedPreferences = getSharedPreferences("movie-prefs", MODE_PRIVATE);
     currentSortType = sharedPreferences.getInt(SORT_KEY, TOP_RATED);
-
+    binding.setIsLoading(true);
     getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, savedInstanceState, this);
     SyncUtil.initMoviesSync(this, currentSortType);
   }
@@ -86,6 +86,9 @@ public class MoviesActivity extends AppCompatActivity
       case R.id.actionSortMostPopular:
         setSortType(MOST_POPULAR);
         return true;
+      case R.id.actionSortFavorites:
+        setSortType(FAVORITES);
+        return true;
       case android.R.id.home:
         supportFinishAfterTransition();
         return true;
@@ -102,23 +105,23 @@ public class MoviesActivity extends AppCompatActivity
   }
 
   private void setSortType(@SortType int type) {
+    binding.setIsLoading(true);
     binding.moviesList.scrollToPosition(0);
     currentSortType = type;
-    if (loader != null) {
-      loader.setSortOrder(DatabaseContract.getSort(currentSortType));
-      loader.forceLoad();
-    }
+    getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
     SyncUtil.startMoviesImmediateSync(this, type);
   }
 
   @SuppressLint("StaticFieldLeak") @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-    loader = new CursorLoader(this, DatabaseContract.CONTENT_URI_MOVIES, null, null, null,
+    return new CursorLoader(this, DatabaseContract.CONTENT_URI_MOVIES, null, null, null,
         DatabaseContract.getSort(currentSortType));
-    return loader;
   }
 
   @Override public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    if (data != null && data.getCount() > 0) {
+      binding.setIsLoading(false);
+    }
     moviesAdapter.swapCursor(data);
   }
 

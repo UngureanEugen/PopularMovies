@@ -15,6 +15,7 @@ import android.com.movies.util.AppExecutors;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -32,17 +33,14 @@ public class SyncService extends IntentService {
   private static final AppExecutors executors = AppExecutors.getInstance();
   /**
    * Creates an IntentService.  Invoked by your subclass's constructor.
-   *
-   * @param name Used to name the worker thread, important only for debugging.
    */
-  // TODO: 7/28/17 check action insert and update
-  public static final String ACTION_INSERT = TAG + ".insert";
-  public static final String ACTION_UPDATE = TAG + ".update";
+  public static final String ACTION_UPDATE_MOVIE = TAG + ".updateMovie";
   public static final String ACTION_SYNC_MOVIES = TAG + ".syncMovies";
   public static final String ACTION_SYNC_TRAILERS = TAG + ".syncTrailers";
   public static final String ACTION_SYNC_REVIEWS = TAG + ".syncReviews";
   public static final String SORT_TYPE = TAG + ".sortType";
   public static final String MOVIE_ID = TAG + ".movieId";
+  public static final String EXTRA = TAG + ".contentValues";
 
   public SyncService(String name) {
     super(name);
@@ -55,6 +53,14 @@ public class SyncService extends IntentService {
   @Override public void onCreate() {
     super.onCreate();
     App.moviesComponent.inject(this);
+  }
+
+  public static void updateMovie(Context context, Uri uri, ContentValues values) {
+    Intent intent = new Intent(context, SyncService.class);
+    intent.setAction(ACTION_UPDATE_MOVIE);
+    intent.setData(uri);
+    intent.putExtra(EXTRA, values);
+    context.startService(intent);
   }
 
   public static void fetch(Context context, Bundle bundle, String action) {
@@ -71,7 +77,17 @@ public class SyncService extends IntentService {
       performSyncTrailers(intent.getExtras());
     } else if (ACTION_SYNC_REVIEWS.equals(intent.getAction())) {
       performSyncReviews(intent.getExtras());
+    } else if (ACTION_UPDATE_MOVIE.equals(intent.getAction())) {
+      ContentValues values = intent.getParcelableExtra(EXTRA);
+      performUpdate(intent.getData(), values);
     }
+  }
+
+  private void performUpdate(Uri uri, ContentValues values) {
+    executors.diskIO().execute(() -> {
+      int count = getContentResolver().update(uri, values, null, null);
+      Log.e(TAG, "updated items count " + count);
+    });
   }
 
   private void performSyncMovies(Bundle extras) {
@@ -88,7 +104,6 @@ public class SyncService extends IntentService {
                   for (int i = 0; i < movies.size(); i++) {
                     contentValues[i] = MovieEntity.convert(movies.get(i));
                   }
-                  // TODO: 7/26/17 bulk insert
                   getApplicationContext().getContentResolver()
                       .bulkInsert(DatabaseContract.CONTENT_URI_MOVIES, contentValues);
                 }
@@ -123,7 +138,6 @@ public class SyncService extends IntentService {
         }
 
         @Override public void onFailure(Call<MovieVideosResponse> call, Throwable t) {
-          // TODO: 7/28/17 event bus
           Log.d(TAG, "onFailure parsing");
         }
       });
@@ -151,7 +165,6 @@ public class SyncService extends IntentService {
         }
 
         @Override public void onFailure(Call<MovieReviewsResponse> call, Throwable t) {
-          // TODO: 7/28/17 event bus
           Log.d(TAG, "onFailure parsing");
         }
       });

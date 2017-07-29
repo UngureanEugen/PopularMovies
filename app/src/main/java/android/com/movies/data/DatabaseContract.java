@@ -55,8 +55,9 @@ public class DatabaseContract {
       MovieColumns.VOTE_AVERAGE, MovieColumns.POPULARITY, MovieColumns.IS_FAVORITE);
   private static final String TOP_RATED_SORT = String.format("%s DESC, %s ASC, %s ASC",
       MovieColumns.VOTE_AVERAGE, MovieColumns.POPULARITY, MovieColumns.IS_FAVORITE);
-  private static final String FAVORITE_SORT = String.format("%s ASC, %s ASC, %s DESC",
-      MovieColumns.VOTE_AVERAGE, MovieColumns.POPULARITY, MovieColumns.IS_FAVORITE);
+
+  private static final String FAVORITE_SORT = String.format("%s DESC, %s ASC, %s ASC",
+      MovieColumns.IS_FAVORITE, MovieColumns.VOTE_AVERAGE, MovieColumns.POPULARITY);
 
   public static final Uri CONTENT_URI_MOVIES = new Uri.Builder().scheme("content")
       .authority(CONTENT_AUTHORITY)

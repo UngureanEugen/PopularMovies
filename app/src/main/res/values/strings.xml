@@ -6,6 +6,7 @@
   <string name="action_top_rated">Top Rated</string>
   <string name="action_favorites">Favorites</string>
   <string name="mark_favorite">mark as\n favorite</string>
+  <string name="mark_unfavorite">unfavorite\n movie</string>
   <string name="poster">poster</string>
   <string name="trailers">Trailers:</string>
 

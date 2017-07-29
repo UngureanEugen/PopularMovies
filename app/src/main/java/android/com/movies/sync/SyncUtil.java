@@ -17,16 +17,11 @@ import static android.com.movies.sync.SyncService.SORT_TYPE;
 
 public final class SyncUtil {
   private static AppExecutors executors = AppExecutors.getInstance();
-  private static boolean moviesSyncInitialized;
-  private static boolean trailersSyncInitialized;
-  private static boolean reviewsSyncInitialized;
 
   private SyncUtil() {
   }
 
   synchronized public static void initMoviesSync(Context context, @SortType int sortType) {
-    if (moviesSyncInitialized) return;
-    moviesSyncInitialized = true;
     executors.diskIO().execute(() -> {
       Cursor cursor = context.getContentResolver().query(DatabaseContract.CONTENT_URI_MOVIES,
           null, null, null, DatabaseContract.getSort(sortType));
@@ -40,8 +35,6 @@ public final class SyncUtil {
   }
 
   synchronized public static void initTrailersSync(@NonNull Context context, int movieId) {
-    if (trailersSyncInitialized) return;
-    trailersSyncInitialized = false;
     executors.diskIO().execute(() -> {
       Cursor cursor = context.getContentResolver()
           .query(ContentUris.withAppendedId(DatabaseContract.CONTENT_URI_TRAILERS, movieId),
@@ -70,7 +63,6 @@ public final class SyncUtil {
   }
 
   public static void startMoviesImmediateSync(@NonNull Context context, @SortType int sortType) {
-    // TODO: 7/27/17 thing about implementation
     if (sortType == SortType.TOP_RATED || sortType == SortType.MOST_POPULAR) {
       Bundle bundle = new Bundle();
       bundle.putInt(SORT_TYPE, sortType);

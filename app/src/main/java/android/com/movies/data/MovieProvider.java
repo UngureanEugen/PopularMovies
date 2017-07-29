@@ -13,8 +13,6 @@ import android.support.annotation.Nullable;
 
 public class MovieProvider extends ContentProvider {
 
-  private static final String TAG = MovieProvider.class.getSimpleName();
-
   private static final int MOVIES = 100;
   private static final int MOVIE_WITH_ID = 101;
   private static final int MOST_POPULAR_MOVIES = 102;

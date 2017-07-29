@@ -6,8 +6,10 @@ import android.com.movies.databinding.ActivityDetailsBinding;
 import android.com.movies.di.NetworkModule;
 import android.com.movies.model.MovieEntity;
 import android.com.movies.model.Video;
+import android.com.movies.sync.SyncService;
 import android.com.movies.sync.SyncUtil;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
@@ -21,6 +23,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.Menu;
 import android.view.MenuItem;
 import com.squareup.picasso.Picasso;
 
@@ -37,17 +40,23 @@ public class MovieDetailsActivity extends AppCompatActivity
   private MovieEntity movie = null;
   private TrailersAdapter trailersAdapter;
   private ReviewsAdapter reviewsAdapter;
+  private MenuItem favoriteMenuItem;
+  private ActivityDetailsBinding binding;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    ActivityDetailsBinding binding =
+    binding =
         DataBindingUtil.setContentView(this, R.layout.activity_details);
 
+    binding.btnMarkFavorite.setOnClickListener(v -> markMovie(!movie.isFavorite));
     Bundle extras = getIntent().getExtras();
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      String transition = extras.getString(EXTRA_MOVIE_IMAGE_TRANSITION);
-      binding.ivPoster.setTransitionName(transition);
+      final String transition;
+      if (extras != null) {
+        transition = extras.getString(EXTRA_MOVIE_IMAGE_TRANSITION);
+        binding.ivPoster.setTransitionName(transition);
+      }
     }
 
     if (extras != null) {
@@ -76,7 +85,8 @@ public class MovieDetailsActivity extends AppCompatActivity
 
       binding.rvTrailers.setHasFixedSize(true);
       binding.rvReviews.setHasFixedSize(true);
-
+      binding.btnMarkFavorite.setText(
+          movie.isFavorite ? R.string.mark_unfavorite : R.string.mark_favorite);
       Picasso.with(this)
           .load(NetworkModule.IMAGE_URL + movie.posterPath)
           .noFade()
@@ -94,17 +104,13 @@ public class MovieDetailsActivity extends AppCompatActivity
     }
   }
 
-  private void subscribeUi() {
- /*   movieViewModel.getVideos().observe(this, trailers -> {
-      if (trailers != null && trailers.data != null) {
-        trailersAdapter.setTrailers(trailers.data);
-      }
-    });
-    movieViewModel.getReviews().observe(this, reviews -> {
-      if (reviews != null && reviews.data != null) {
-        reviewsAdapter.setReviews(reviews.data);
-      }
-    });*/
+  @Override public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.detail_menu, menu);
+    favoriteMenuItem = menu.findItem(R.id.actionMarkFavorite);
+    int icon =
+        movie.isFavorite ? R.drawable.ic_star_white_24dp : R.drawable.ic_star_border_white_24dp;
+    favoriteMenuItem.setIcon(icon);
+    return true;
   }
 
   @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -112,9 +118,23 @@ public class MovieDetailsActivity extends AppCompatActivity
       case android.R.id.home:
         supportFinishAfterTransition();
         return true;
+      case R.id.actionMarkFavorite:
+        markMovie(!movie.isFavorite);
+        return true;
       default:
         return super.onOptionsItemSelected(item);
     }
+  }
+
+  private void markMovie(boolean isFavorite) {
+    movie.isFavorite = isFavorite;
+    ContentValues values = new ContentValues(4);
+    values.put(DatabaseContract.MovieColumns.IS_FAVORITE, isFavorite ? 1 : 0);
+    SyncService.updateMovie(this,
+        ContentUris.withAppendedId(DatabaseContract.CONTENT_URI_MOVIES, movie.id), values);
+    binding.btnMarkFavorite.setText(
+        movie.isFavorite ? R.string.mark_unfavorite : R.string.mark_favorite);
+    invalidateOptionsMenu();
   }
 
   @Override public void onClick(Video trailer) {
