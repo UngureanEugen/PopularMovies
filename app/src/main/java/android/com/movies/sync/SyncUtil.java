@@ -21,37 +21,45 @@ public final class SyncUtil {
   private SyncUtil() {
   }
 
-  synchronized public static void initMoviesSync(Context context, @SortType int sortType) {
-    executors.diskIO().execute(() -> {
-      Cursor cursor = context.getContentResolver().query(DatabaseContract.CONTENT_URI_MOVIES,
-          null, null, null, DatabaseContract.getSort(sortType));
-      if (null == cursor || cursor.getCount() == 0) {
-        startMoviesImmediateSync(context, sortType);
-      }
-      if (cursor != null) {
-        cursor.close();
-      }
-    });
-  }
-
-  synchronized public static void initTrailersSync(@NonNull Context context, int movieId) {
-    executors.diskIO().execute(() -> {
-      Cursor cursor = context.getContentResolver()
-          .query(ContentUris.withAppendedId(DatabaseContract.CONTENT_URI_TRAILERS, movieId),
-              null, null, null, null);
-      if (null == cursor || cursor.getCount() == 0) {
-        startTrailersImmediateSync(context, movieId);
+  synchronized public static void initMoviesSync(final Context context,
+      @SortType final int sortType) {
+    executors.diskIO().execute(new Runnable() {
+      @Override public void run() {
+        Cursor cursor = context.getContentResolver().query(DatabaseContract.CONTENT_URI_MOVIES,
+            null, null, null, DatabaseContract.getSort(sortType));
+        if (null == cursor || cursor.getCount() == 0) {
+          startMoviesImmediateSync(context, sortType);
+        }
+        if (cursor != null) {
+          cursor.close();
+        }
       }
     });
   }
 
-  synchronized public static void initReviewsSync(Context context, Integer movieId) {
-    executors.diskIO().execute(() -> {
-      Cursor cursor = context.getContentResolver()
-          .query(ContentUris.withAppendedId(DatabaseContract.CONTENT_URI_REVIEWS, movieId),
-              null, null, null, null);
-      if (null == cursor || cursor.getCount() == 0) {
-        startReviewsImmediateSync(context, movieId);
+  synchronized public static void initTrailersSync(@NonNull final Context context,
+      final int movieId) {
+    executors.diskIO().execute(new Runnable() {
+      @Override public void run() {
+        Cursor cursor = context.getContentResolver()
+            .query(ContentUris.withAppendedId(DatabaseContract.CONTENT_URI_TRAILERS, movieId),
+                null, null, null, null);
+        if (null == cursor || cursor.getCount() == 0) {
+          startTrailersImmediateSync(context, movieId);
+        }
+      }
+    });
+  }
+
+  synchronized public static void initReviewsSync(final Context context, final Integer movieId) {
+    executors.diskIO().execute(new Runnable() {
+      @Override public void run() {
+        Cursor cursor = context.getContentResolver()
+            .query(ContentUris.withAppendedId(DatabaseContract.CONTENT_URI_REVIEWS, movieId),
+                null, null, null, null);
+        if (null == cursor || cursor.getCount() == 0) {
+          startReviewsImmediateSync(context, movieId);
+        }
       }
     });
   }

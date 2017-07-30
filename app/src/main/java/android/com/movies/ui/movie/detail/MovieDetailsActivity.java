@@ -25,6 +25,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import com.squareup.picasso.Picasso;
 
 import static android.com.movies.ui.movie.MoviesActivity.EXTRA_MOVIE;
@@ -49,7 +50,11 @@ public class MovieDetailsActivity extends AppCompatActivity
     binding =
         DataBindingUtil.setContentView(this, R.layout.activity_details);
 
-    binding.btnMarkFavorite.setOnClickListener(v -> markMovie(!movie.isFavorite));
+    binding.btnMarkFavorite.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        MovieDetailsActivity.this.markMovie(!movie.isFavorite);
+      }
+    });
     Bundle extras = getIntent().getExtras();
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       final String transition;

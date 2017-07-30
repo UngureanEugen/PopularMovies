@@ -83,91 +83,99 @@ public class SyncService extends IntentService {
     }
   }
 
-  private void performUpdate(Uri uri, ContentValues values) {
-    executors.diskIO().execute(() -> {
-      int count = getContentResolver().update(uri, values, null, null);
-      Log.e(TAG, "updated items count " + count);
+  private void performUpdate(final Uri uri, final ContentValues values) {
+    executors.diskIO().execute(new Runnable() {
+      @Override public void run() {
+        int count = getContentResolver().update(uri, values, null, null);
+        Log.e(TAG, "updated items count " + count);
+      }
     });
   }
 
   private void performSyncMovies(Bundle extras) {
-    @SortType int sortType = extras.getInt(SORT_TYPE, SortType.NOT_DEFINED);
-    executors.networkIO().execute(() -> {
-      service.fetchMovies(sortType == SortType.TOP_RATED ? "top_rated" : "popular")
-          .enqueue(new Callback<MoviesResponse>() {
-            @Override public void onResponse(Call<MoviesResponse> call,
-                Response<MoviesResponse> response) {
-              if (response.isSuccessful() && response.body() != null) {
-                List<MovieEntity> movies = response.body().movies;
-                if (movies != null) {
-                  ContentValues[] contentValues = new ContentValues[movies.size()];
-                  for (int i = 0; i < movies.size(); i++) {
-                    contentValues[i] = MovieEntity.convert(movies.get(i));
+    @SortType final int sortType = extras.getInt(SORT_TYPE, SortType.NOT_DEFINED);
+    executors.networkIO().execute(new Runnable() {
+      @Override public void run() {
+        service.fetchMovies(sortType == SortType.TOP_RATED ? "top_rated" : "popular")
+            .enqueue(new Callback<MoviesResponse>() {
+              @Override public void onResponse(Call<MoviesResponse> call,
+                  Response<MoviesResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                  List<MovieEntity> movies = response.body().movies;
+                  if (movies != null) {
+                    ContentValues[] contentValues = new ContentValues[movies.size()];
+                    for (int i = 0; i < movies.size(); i++) {
+                      contentValues[i] = MovieEntity.convert(movies.get(i));
+                    }
+                    getApplicationContext().getContentResolver()
+                        .bulkInsert(DatabaseContract.CONTENT_URI_MOVIES, contentValues);
                   }
-                  getApplicationContext().getContentResolver()
-                      .bulkInsert(DatabaseContract.CONTENT_URI_MOVIES, contentValues);
                 }
               }
-            }
 
-            @Override public void onFailure(Call<MoviesResponse> call, Throwable t) {
-              Log.e(TAG, t.getMessage());
-            }
-          });
+              @Override public void onFailure(Call<MoviesResponse> call, Throwable t) {
+                Log.e(TAG, t.getMessage());
+              }
+            });
+      }
     });
   }
 
   private void performSyncTrailers(Bundle extras) {
-    int movieId = extras.getInt(MOVIE_ID);
-    executors.networkIO().execute(() -> {
-      service.fetchVideos(String.valueOf(movieId)).enqueue(new Callback<MovieVideosResponse>() {
-        @Override
-        public void onResponse(Call<MovieVideosResponse> call,
-            Response<MovieVideosResponse> response) {
-          if (response.isSuccessful() && response.body() != null) {
-            List<Video> trailers = response.body().videos;
-            if (trailers != null) {
-              ContentValues[] values = new ContentValues[trailers.size()];
-              for (int i = 0; i < trailers.size(); i++) {
-                values[i] = Video.convert(trailers.get(i), movieId);
+    final int movieId = extras.getInt(MOVIE_ID);
+    executors.networkIO().execute(new Runnable() {
+      @Override public void run() {
+        service.fetchVideos(String.valueOf(movieId)).enqueue(new Callback<MovieVideosResponse>() {
+          @Override
+          public void onResponse(Call<MovieVideosResponse> call,
+              Response<MovieVideosResponse> response) {
+            if (response.isSuccessful() && response.body() != null) {
+              List<Video> trailers = response.body().videos;
+              if (trailers != null) {
+                ContentValues[] values = new ContentValues[trailers.size()];
+                for (int i = 0; i < trailers.size(); i++) {
+                  values[i] = Video.convert(trailers.get(i), movieId);
+                }
+                getApplicationContext().getContentResolver()
+                    .bulkInsert(DatabaseContract.CONTENT_URI_TRAILERS, values);
               }
-              getApplicationContext().getContentResolver()
-                  .bulkInsert(DatabaseContract.CONTENT_URI_TRAILERS, values);
             }
           }
-        }
 
-        @Override public void onFailure(Call<MovieVideosResponse> call, Throwable t) {
-          Log.d(TAG, "onFailure parsing");
-        }
-      });
+          @Override public void onFailure(Call<MovieVideosResponse> call, Throwable t) {
+            Log.d(TAG, "onFailure parsing");
+          }
+        });
+      }
     });
   }
 
   private void performSyncReviews(Bundle extras) {
-    int movieId = extras.getInt(MOVIE_ID);
-    executors.networkIO().execute(() -> {
-      service.fetchReviews(String.valueOf(movieId)).enqueue(new Callback<MovieReviewsResponse>() {
-        @Override
-        public void onResponse(Call<MovieReviewsResponse> call,
-            Response<MovieReviewsResponse> response) {
-          if (response.isSuccessful() && response.body() != null) {
-            List<Review> reviews = response.body().reviews;
-            if (reviews != null) {
-              ContentValues[] values = new ContentValues[reviews.size()];
-              for (int i = 0; i < reviews.size(); i++) {
-                values[i] = Review.convert(reviews.get(i), movieId);
+    final int movieId = extras.getInt(MOVIE_ID);
+    executors.networkIO().execute(new Runnable() {
+      @Override public void run() {
+        service.fetchReviews(String.valueOf(movieId)).enqueue(new Callback<MovieReviewsResponse>() {
+          @Override
+          public void onResponse(Call<MovieReviewsResponse> call,
+              Response<MovieReviewsResponse> response) {
+            if (response.isSuccessful() && response.body() != null) {
+              List<Review> reviews = response.body().reviews;
+              if (reviews != null) {
+                ContentValues[] values = new ContentValues[reviews.size()];
+                for (int i = 0; i < reviews.size(); i++) {
+                  values[i] = Review.convert(reviews.get(i), movieId);
+                }
+                getApplicationContext().getContentResolver()
+                    .bulkInsert(DatabaseContract.CONTENT_URI_REVIEWS, values);
               }
-              getApplicationContext().getContentResolver()
-                  .bulkInsert(DatabaseContract.CONTENT_URI_REVIEWS, values);
             }
           }
-        }
 
-        @Override public void onFailure(Call<MovieReviewsResponse> call, Throwable t) {
-          Log.d(TAG, "onFailure parsing");
-        }
-      });
+          @Override public void onFailure(Call<MovieReviewsResponse> call, Throwable t) {
+            Log.d(TAG, "onFailure parsing");
+          }
+        });
+      }
     });
   }
 }
